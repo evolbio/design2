@@ -18,7 +18,7 @@ endif
 PROG    = $(NAME).$(SUFFIX)
 DEPEND  = src/dependencies.$(SUFFIX)
 
-CXXFILES   =  $(NAME).cc
+CXXFILES   =  $(NAME).cc Individual.cc
 OBJFILES   = $(CXXFILES:.cc=.o)
 
 # defs for linking to sim_client.cc instead of main-alone.cc
@@ -35,7 +35,7 @@ PLDFLAGS = `pkg-config --libs protobuf grpc++ grpc` -lgrpc++_reflection
 APPHEAD   = $(NAME).h
 
 CXX = g++
-CXXFLAGS += -std=c++1z
+CXXFLAGS += -std=c++17      # c++1z also, but can now use c++17 explicitly
 CXXFLAGS += -pedantic -Wall -Wextra -W \
   -Wconversion -Wshadow -Wundef \
   -Wpointer-arith -Wcast-align \
@@ -43,7 +43,7 @@ CXXFLAGS += -pedantic -Wall -Wextra -W \
   -Wcast-qual -Wconversion \
   -g $(INCFLAGS) $(DEFS) -O3 #-pg #-DDEBUG
 LDFLAGS += -L$(HOME)/sim/simlib/lib_osx -L/opt/local/lib\
-             -lutilSAF -lboost_system-mt -lboost_filesystem-mt -lboost_random-mt #-lgsl -lgslcblas
+             -lutilSAF -lboost_system-mt -lboost_filesystem-mt #-lgsl -lgslcblas
 
 INCFLAGS = -I$(HOME)/sim/simlib/include -Isrc -I$(PROTO_PATH) -isystem /opt/local/include
 VPATH 	= src:$(PROTO_PATH)

@@ -3,29 +3,33 @@
 #define _typedefs_h 1
 
 struct Param{
-    int runNum;
-    int time;               // end time for run
-    int tinit;              // initial time before collecting stats
-    char bndry;             // p => periodic; r => reflective
-    double step;            // length of time step
-    int oincr;              // number of steps between data collection
-    int sinit;              // initial # of S molecules
-    int xinit;              // initial # of X molecules
-    int rinit;              // initial # of R molecules
-    double diff;            // base diffusion rate, added starting w/ExpF
-    double ds,dx,da,dr;     // diffusion coefficients, each multiplied by diff
-    double rsxf,rsxb;       // forward and backward rates S+X->SX
-    double rapr;            // A prod rate, SX -> SX + A
-    double radc;            // A decay rate, A -> 0
-    double gmsx;            // geminate recombination prob for SX back rx
-    char *pfile;            // smoldyn param file in /tmp/ directory
-    char *ofile;            // smoldyn output file in /tmp/ directory
+    int   runNum;
+    int   distnSteps;
+    int   gen;
+    int   loci;
+    int   popsize;
+    float mutation;
+    float recombination;
+    float s;        // strength of selection
+    float minFail;  // min failure rate per component
+    float failExp;  // exponent to scale failure rate
 };
 
-typedef struct Param Param;
+using Param = struct Param;
 
-typedef signed char schar;
-typedef unsigned char uchar;
-typedef unsigned int uint;
+using schar = signed char;
+using uchar = unsigned char;
+using uint  = unsigned int;
+
+using Allele    = float;
+using AllelePtr = Allele*;
+using FLOAT     = double;            // use double here to change to double precision
+using FLOATPTR  = FLOAT*;
+using FLTMATRIX = FLOAT**;
+using GSL       = double;           // GSL uses double, so for all stats use this type
+using GSLPTR    = GSL*;
+using GLSMATRIX = GSL**;
+
+using IntMatrix = int**;
 
 #endif

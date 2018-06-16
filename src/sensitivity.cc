@@ -6,18 +6,12 @@
 #include <random>
 #include <climits>
 
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_01.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
-
 #include "format.h"
 #include "sensitivity.h"
 #include "SAFrand_pcg.h"
-#include "SAFrand_mt.h"
 #include "SAFtimer.h"
-#include "pcg_random.hpp"
 
-const int 	linesPerRun = 4;
+const int 	linesPerRun = 3;
 SAFrand_pcg<pcgT> rnd;
 
 // start with result and fix all other strings and files
@@ -64,27 +58,21 @@ void LifeCycle(Param& param, std::ostringstream& resultss)
 
 void GetParam(Param& p, std::istringstream& parmBuf)
 {
-    double tmpOincr, tmpSinit, tmpXinit, tmpRinit;
+    double tmpGen, tmpLoci, tmpPop;
     
-    parmBuf >> p.runNum >> p.step >> tmpOincr >> tmpSinit >> tmpXinit >> tmpRinit >> p.diff >> p.ds >> p.dx >> p.da >> p.dr >> p.rsxf >> p.rsxb >> p.rapr >> p.radc >> p.gmsx;
+    parmBuf >> p.runNum >> tmpGen >> tmpLoci >> tmpPop >> p.mutation >> p.recombination >> p.s >> p.minFail >> p.failExp;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
 
-    p.oincr = round<int>(tmpOincr);
-    p.sinit = round<int>(tmpSinit);
-    p.xinit = round<int>(tmpXinit);
-    p.rinit = round<int>(tmpRinit);
-    p.ds *= p.diff;
-    p.dx *= p.diff;
-    p.da *= p.diff;
-    p.dr *= p.diff;
+    p.gen = round<int>(tmpGen);
+    p.loci = round<int>(tmpLoci);
+    p.popsize = round<int>(tmpPop);
     
-    int tmpBndry, newseed;
+    int newseed;
     unsigned parmSeed;
-    parmBuf >> p.time >> p.tinit >> tmpBndry >> parmSeed >> newseed;
+    parmBuf >> p.distnSteps >> parmSeed >> newseed;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
-    p.bndry = (tmpBndry == 0) ? 'p' : 'r';
 	if (!newseed)
 		rnd.setRandSeed(parmSeed);	// initial random numbers
 }
@@ -95,23 +83,15 @@ std::string PrintParam(Param& p)
     std::string format = "{:<10} = {:>9}\n";
     std::string formatf = "{:<10} = {:>9.3e}\n";
     outString += fmt::format(format, "Run", p.runNum);
-    outString += fmt::format(format, "time", p.time);
-    outString += fmt::format(format, "tinit", p.tinit);
-    outString += fmt::format(formatf, "step", p.step);
-    outString += fmt::format(format, "bndry", p.bndry);
-    outString += fmt::format(format, "oincr", p.oincr);
-    outString += fmt::format(format, "sinit", p.sinit);
-    outString += fmt::format(format, "xinit", p.xinit);
-    outString += fmt::format(format, "rinit", p.rinit);
-    outString += fmt::format(formatf, "ds", p.ds);
-    outString += fmt::format(formatf, "dx", p.dx);
-    outString += fmt::format(formatf, "da", p.da);
-    outString += fmt::format(formatf, "dr", p.dr);
-    outString += fmt::format(formatf, "rsxf", p.rsxf);
-    outString += fmt::format(formatf, "rsxb", p.rsxb);
-    outString += fmt::format(formatf, "rapr", p.rapr);
-    outString += fmt::format(formatf, "radc", p.radc);
-    outString += fmt::format(formatf, "gmsx", p.gmsx);
+    outString += fmt::format(format, "disStp", p.distnSteps);
+    outString += fmt::format(format, "gen", p.gen);
+    outString += fmt::format(format, "loci", p.loci);
+    outString += fmt::format(format, "popSz", p.popsize);
+    outString += fmt::format(formatf, "mut", p.mutation);
+    outString += fmt::format(formatf, "rec", p.recombination);
+    outString += fmt::format(formatf, "s", p.s);
+    outString += fmt::format(formatf, "minFail", p.minFail);
+    outString += fmt::format(formatf, "failExp", p.failExp);
     outString += "\n";
     return outString;
 }
