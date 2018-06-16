@@ -20,6 +20,10 @@
 		AAE8229720D4BC2800ADA04C /* Individual.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Individual.cc; path = src/Individual.cc; sourceTree = "<group>"; };
 		AAE8229820D4BC2800ADA04C /* Individual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Individual.h; path = src/Individual.h; sourceTree = "<group>"; };
 		AAE8229920D4CA5B00ADA04C /* design.Expt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = design.Expt; path = input/design.Expt; sourceTree = "<group>"; };
+		AAE8229E20D4D72C00ADA04C /* Population.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Population.cc; path = src/Population.cc; sourceTree = "<group>"; };
+		AAE8229F20D4D72C00ADA04C /* Population.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Population.h; path = src/Population.h; sourceTree = "<group>"; };
+		AAE822A020D4D72C00ADA04C /* SumStat.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SumStat.cc; path = src/SumStat.cc; sourceTree = "<group>"; };
+		AAE822A120D4D72C00ADA04C /* SumStat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SumStat.h; path = src/SumStat.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -47,6 +51,10 @@
 		AA8E1E0620D3944800935CDC /* src */ = {
 			isa = PBXGroup;
 			children = (
+				AAE8229E20D4D72C00ADA04C /* Population.cc */,
+				AAE8229F20D4D72C00ADA04C /* Population.h */,
+				AAE822A020D4D72C00ADA04C /* SumStat.cc */,
+				AAE822A120D4D72C00ADA04C /* SumStat.h */,
 				AAE8229720D4BC2800ADA04C /* Individual.cc */,
 				AAE8229820D4BC2800ADA04C /* Individual.h */,
 				AA8E1E0920D3955500935CDC /* main-alone.cc */,

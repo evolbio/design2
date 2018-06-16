@@ -18,7 +18,7 @@ endif
 PROG    = $(NAME).$(SUFFIX)
 DEPEND  = src/dependencies.$(SUFFIX)
 
-CXXFILES   =  $(NAME).cc Individual.cc
+CXXFILES   =  $(NAME).cc Individual.cc Population.cc SumStat.cc
 OBJFILES   = $(CXXFILES:.cc=.o)
 
 # defs for linking to sim_client.cc instead of main-alone.cc
@@ -43,7 +43,7 @@ CXXFLAGS += -pedantic -Wall -Wextra -W \
   -Wcast-qual -Wconversion \
   -g $(INCFLAGS) $(DEFS) -O3 #-pg #-DDEBUG
 LDFLAGS += -L$(HOME)/sim/simlib/lib_osx -L/opt/local/lib\
-             -lutilSAF -lboost_system-mt -lboost_filesystem-mt #-lgsl -lgslcblas
+             -lutilSAF -lboost_system-mt -lboost_filesystem-mt -lgsl -lgslcblas
 
 INCFLAGS = -I$(HOME)/sim/simlib/include -Isrc -I$(PROTO_PATH) -isystem /opt/local/include
 VPATH 	= src:$(PROTO_PATH)

@@ -19,7 +19,8 @@ using Param = struct Param;
 
 using schar = signed char;
 using uchar = unsigned char;
-using uint  = unsigned int;
+// using uint  = unsigned int;
+using ulong  = unsigned long;
 
 using Allele    = float;
 using AllelePtr = Allele*;
@@ -28,7 +29,7 @@ using FLOATPTR  = FLOAT*;
 using FLTMATRIX = FLOAT**;
 using GSL       = double;           // GSL uses double, so for all stats use this type
 using GSLPTR    = GSL*;
-using GLSMATRIX = GSL**;
+using GSLMATRIX = GSL**;
 
 using IntMatrix = int**;
 

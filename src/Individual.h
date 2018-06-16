@@ -29,12 +29,12 @@ public:
     FLOAT           getFitness(){return fitness;};
     AllelePtr	    getGenotype(){return genotype;};
 private:
-    static float	mut;            // per genome mutation rate, param.mutation is per locus mutation rate
+    static FLOAT	mut;            // per genome mutation rate, param.mutation is per locus mutation rate
     static int		totalLoci;
-    static float    s;              // selection coefficient
-    static float    rec;            // recombination probability
-    static float    minFail;        // minimum failure rate
-    static float    failExp;        // failure exponent scaling
+    static FLOAT    s;              // selection coefficient
+    static FLOAT    rec;            // recombination probability
+    static FLOAT    minFail;        // minimum failure rate
+    static FLOAT    failExp;        // failure exponent scaling
     AllelePtr 		genotype;       // array of failure probabilities, haploid so each allele is a single failure prob
     FLOAT           fitness;
 };

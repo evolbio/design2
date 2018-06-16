@@ -1,14 +1,13 @@
-#include <string.h>
-#include <math.h>
+#include <cmath>
 #include "Individual.h"
 
 // declare static private member variables
 
-float Individual::mut;
-float Individual::rec;
-float Individual::s;
-float Individual::minFail;
-float Individual::failExp;
+FLOAT Individual::mut;
+FLOAT Individual::rec;
+FLOAT Individual::s;
+FLOAT Individual::minFail;
+FLOAT Individual::failExp;
 int Individual::totalLoci;
 
 Individual::~Individual()
@@ -26,7 +25,7 @@ void Individual::initialize(Param& param)
     
     // randomly, set 95% of alleles to min failure probability, and 5% randomly on [minFail,1]
     for (int i = 0; i < totalLoci; ++i){
-        genotype[i] = (rnd.rU01() < 0.95) ? param.minFail : param.minFail + (1-param.minFail)*rnd.rU01();
+        genotype[i] = static_cast<Allele>((rnd.rU01() < 0.95) ? param.minFail : param.minFail + (1-param.minFail)*rnd.rU01());
     }
     fitness = calcFitness();
 }
@@ -47,10 +46,10 @@ void Individual::setParam(Param& param)
 
 void Individual::mutate()
 {
-    int hits = rnd.poisson(mut);
-    for (int i = 0; i < hits; ++i){
-        int locus = rnd.rtop(totalLoci);
-        genotype[locus] = minFail + (1.0-minFail)*rnd.rU01();     // uniform on [minFail, 1]
+    ulong hits = rnd.poisson(mut);
+    for (unsigned i = 0; i < hits; ++i){
+        ulong locus = rnd.rtop(totalLoci);
+        genotype[locus] = static_cast<Allele>(minFail + (1.0-minFail)*rnd.rU01());  // uniform on [minFail, 1]
     }
 }
 
@@ -59,7 +58,7 @@ void SetBabyGenotype(Individual& Parent1, Individual &Parent2, Individual& baby)
 	AllelePtr g1 = Parent1.genotype;
 	AllelePtr g2 = Parent2.genotype;
 	AllelePtr gb = baby.genotype;
-	int chrFlag = rnd.rbit();		// determines which parent is used for copying
+	ulong chrFlag = rnd.rbit();		// determines which parent is used for copying
     FLOAT probFailure = 1.0;        // fitness is prob of not failing, which is 1 - product of failure prob
                                     // at each locus, calc here for efficiency
 	
