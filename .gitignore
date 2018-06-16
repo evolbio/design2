@@ -1,0 +1,12 @@
+*.osx
+01_Literature
+sensitivity
+log
+proto
+input/*random*
+input/design*
+input/Exp*parm*
+output/*data*
+xcuserdata
+dependencies.*
+output/Exp*

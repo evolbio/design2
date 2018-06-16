@@ -1,0 +1,45 @@
+COMMENTS:
+
+	time		end time for run
+    tinit       initial time before collecting stats
+    bndry       boundary: 0 => periodic; 1 => reflective
+    step        length of time step
+    oincr       number of steps between data collection, must be integer
+    sinit       initial # of S molecules
+    xinit       initial # of X molecules
+    diff        base diffusion rate, added starting w/ExpF
+    ds,dx,da,dsx    diffusion coefficients, each multiplied by diff
+    rsxf,rsxb   forward and backward rates S+X->SX
+    rapr        A prod rate, SX -> SX + A
+    radc        A decay rate, A -> 0
+    gmsx        geminate recombination prob for SX back rx
+
+					
+REPLICATES  = 3
+CONTROL PARAMETERS:
+time		= 600   // end time for run
+tinit		= 200	// initial time before collecting stats 
+bndry       = 0     // 0 => periodic; 1 => reflective
+seed        = 7777  // random seed if newseed is zero
+newseed     = 1     // !0 => get seed from file rather than here
+END
+DESIGN PARAMETERS:
+Param    Levels     Center     Increm  Scale
+
+step       3          1e-3       2       E
+oincr      1          1e1        2       E
+sinit      301        1.51e3     10       L
+xinit      1          8e1        2       E
+rinit      1          2e1        10      L
+diff       1          1e-5       10      E
+ds         1          1e0        2       E
+dx         1          1e0        2       E
+da         1          1e0        2       E
+dr         1          1e0        2       E
+rsxf       1          5e-6       2       E
+rsxb       1          4e-3       2       E
+rapr       1          5.0e1      2       E
+radc       1          4e-3       2       E
+gmsx       1          1.0e-0     0.1     L
+
+END
