@@ -11,6 +11,8 @@
 #include "SAFrand_pcg.h"
 #include "SAFtimer.h"
 
+#include "Population.h"
+
 const int 	linesPerRun = 3;
 SAFrand_pcg<pcgT> rnd;
 
@@ -21,7 +23,7 @@ SAFrand_pcg<pcgT> rnd;
 void 		GetParam(Param& p, std::istringstream& parmBuf);
 void 		LifeCycle(Param& param, std::ostringstream& resultss);
 std::string PrintParam(Param& p);
-void        PrintSummary(Param& param, std::ostringstream& resultss);
+void        PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats);
 
 /*****************************************************************/
 
@@ -53,7 +55,27 @@ void LifeCycle(Param& param, std::ostringstream& resultss)
         std::cout << fmt::format("\nrunNum = {:>3}\n\n", param.runNum);
         std::cout.flush();
     }
-    PrintSummary(param, resultss);
+    Population p1(param);
+    Population p2(param);
+    Population *op, *np, *swap;     // oldpop and newpop
+    op = &p1;
+    np = &p2;
+    SumStat stats;
+    stats.initialize(param);
+    int gen = param.gen;
+    int i;
+
+    op->setFitnessArray();
+    for (i = 0; i < gen; ++i){
+        if (showProgress && ((i % 1000) == 0))
+            std::cout << fmt::format("Rep {:8} of {:8}\n", i, param.gen);
+        np->reproduceMutateCalcFit(*op);
+        swap = op;
+        op = np;
+        np = swap;
+    }
+    op->calcStats(param, stats);
+    PrintSummary(param, resultss, stats);
 }
 
 void GetParam(Param& p, std::istringstream& parmBuf)
@@ -96,51 +118,96 @@ std::string PrintParam(Param& p)
     return outString;
 }
 
-void PrintSummary(Param& param, std::ostringstream& resultss)
+void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
 {
     resultss << PrintParam(param);
-    resultss << "-------------------------\n\n";
-    
-    constexpr int reps = 10'000'000;
-    SAFTimer mytimer;
-    
-    double x = 0;
-    auto g = rnd.generator();
-    mytimer.start();
-    for (int i = 0; i <= reps; i++){
-        //x += std::uniform_real_distribution<double>{0.0, 1.0}(pcg);
-        x += g();
-    }
-    mytimer.stop();
-    resultss << fmt::format("pcg32  = {:8.3e}, elapsed time = {} micro s\n", x, mytimer.time<microseconds>());
-    
-    resultss << "\n--------------------------\n\n";
-        
-   // rtop, rbit, rbitB
+    resultss << fmt::format("{}{}", "Distribution of disease frequencies,",
+                             " rows are percentiles\n");
+    resultss << fmt::format("{}", "\tFirst entry is raw value, second entry is normalized\n\n");
+    resultss << fmt::format("{:5}{:>11}{:>8}\n", "", "Raw", "Nrmlzd");
+    resultss << fmt::format("{:5}{:11.3e}{:>8}\n", " Mean", stats.getAveDisease(), "NA");
+    resultss << fmt::format("{:5}{:11.3e}{:>8}\n", "   SD", stats.getSDDisease(), "NA");
 
-    x = 0;
-    mytimer.start();
-    for (int i = 0; i <= reps; i++){
-        x += rnd.rbit();
-    }
-    mytimer.stop();
-    resultss << fmt::format("rbit  = {:8.3e}, elapsed time = {} micro s\n", x, mytimer.time<microseconds>());
+    GSLPTR diseaseDistn = stats.getDiseaseDistn();
+    GSLPTR diseaseDistnNormal = stats.getDiseaseDistnNormal();
     
-    x = 0;
-    mytimer.start();
-    for (int i = 0; i <= reps; i++){
-        x += g(2);
+    for (int j = 0; j < param.distnSteps; ++j){
+        resultss << fmt::format("{:5.1f}", 100.0*(double)j/(double)(param.distnSteps-1));
+        resultss << fmt::format("{:11.3e}{:8.3f}\n", diseaseDistn[j],  diseaseDistnNormal[j]);
     }
-    mytimer.stop();
-    resultss << fmt::format("rtop  = {:8.3e}, elapsed time = {} micro s\n", x, mytimer.time<microseconds>());
+    resultss << "\n";
+
+    // print fitness distn
     
-    x = 0;
-    mytimer.start();
-    for (int i = 0; i <= reps; i++){
-        x += rnd.rbit30();
+    resultss << fmt::format("{}", "Fitness distribution\n\n");
+    resultss << fmt::format("{:5}{:11.3e}\n", " Mean", stats.getAveFitness());
+    resultss << fmt::format("{:5}{:11.3e}\n", "   SD", stats.getSDFitness());
+    
+    GSLPTR fitness = stats.getFitnessDistn();
+    
+    for (int j = 0; j < param.distnSteps; ++j){
+        resultss << fmt::format("{:5.1f}", 100.0*(double)j/(double)(param.distnSteps-1));
+        resultss << fmt::format("{:11.3e}\n", fitness[j]);
     }
-    mytimer.stop();
-    resultss << fmt::format("mask  = {:8.3e}, elapsed time = {} micro s\n", x, mytimer.time<microseconds>());
+    resultss << "\n";
+
+    // print genotype distn statistics for each locus
     
+    GSLPTR gMean = stats.getGMean();
+    GSLPTR gSD = stats.getGSD();
+    GSLMATRIX gDistn = stats.getGDistn();
+    
+    resultss << "Distribution of genotype values, rows are percentiles\n\n";
+    
+    resultss <<  "     ";
+    for (int i = 0; i < param.loci; ++i){
+        resultss << fmt::format((i < 10) ? "{:>6}{:1}" : "{:>5}{:2}", "g", i);
+    }
+    resultss << "\n";
+    
+    resultss <<  " Mean";
+    for (int i = 0; i < param.loci; ++i){
+        resultss << fmt::format("{:7.3f}", gMean[i]);
+    }
+    resultss << "\n";
+
+    resultss <<  "   SD";
+    for (int i = 0; i < param.loci; ++i){
+        resultss << fmt::format("{:7.3f}", gSD[i]);
+    }
+    resultss << "\n";
+
+    for (int j = 0; j < param.distnSteps; ++j){
+        resultss << fmt::format("{:5.1f}", 100.0*(double)j/(double)(param.distnSteps-1));
+        for (int i = 0; i < param.loci; ++i){
+            resultss << fmt::format("{:7.3f}", gDistn[i][j]);
+        }
+        resultss << "\n";
+    }
+    
+    resultss << "\n\n";
+
+    // print G corr matrix
+    
+    GSLMATRIX gCorr = stats.getGCorr();
+    
+    resultss << "Correlation of G values\n\n";
+    
+    resultss <<  "     ";
+    for (int i = 0; i < param.loci; ++i){
+        resultss << fmt::format((i < 10) ? "{:>6}{:1}" : "{:>5}{:2}", "g", i);
+    }
+    resultss << "\n";
+
+    for (int i = 0; i < param.loci; ++i){
+        resultss << fmt::format((i < 10) ? "{:>4}{:1}" : "{:>3}{:2}", "g", i);
+        for (int j = 0; j < param.loci; ++j){
+            resultss << fmt::format("{:7.3f}", gCorr[i][j]);
+        }
+        resultss << "\n";
+    }
+    
+    resultss << "\n\n";
+
 }
 
