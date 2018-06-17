@@ -42,7 +42,7 @@ CXXFLAGS += -pedantic -Wall -Wextra -W \
   -Wwrite-strings -Wstrict-prototypes \
   -Wcast-qual -Wconversion \
   -g $(INCFLAGS) $(DEFS) -O3 #-pg #-DDEBUG
-LDFLAGS += -L$(HOME)/sim/simlib/lib_osx -L/opt/local/lib\
+LDFLAGS += -L$(HOME)/sim/simlib/lib_osx -L/opt/local/lib -lfmt\
              -lutilSAF -lboost_system-mt -lboost_filesystem-mt -lgsl -lgslcblas
 
 INCFLAGS = -I$(HOME)/sim/simlib/include -Isrc -I$(PROTO_PATH) -isystem /opt/local/include
