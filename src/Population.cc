@@ -19,7 +19,7 @@ Population::Population(Param& param)
     cumFit = new FLOAT[popSize];
     ind[0].setParam(param);
 	for (int i = 0; i < popSize; i++){
-		ind[i].initialize(param);
+		ind[i].initialize();
 	}
 }
 
@@ -60,7 +60,6 @@ void Population::calcStats(Param& param, SumStat& stats)
     int i, j;
     GSL d = param.distnSteps - 1.0;
     Individual *indPtr = ind;
-    GSLPTR disease = new GSL[popSize];       
     GSLPTR fitness = new GSL[popSize];
     GSLMATRIX gMatrix = new GSLPTR[param.loci];
     for (i = 0; i < param.loci; ++i){
@@ -69,14 +68,11 @@ void Population::calcStats(Param& param, SumStat& stats)
     
     for (i = 0; i < popSize; ++i, ++indPtr){
         fitness[i] = cumFit[i] - ((i>0) ? cumFit[i-1] : 0.0);
-        disease[i] = (1.0 - fitness[i]) / param.s;              // fit = 1-s*disease => disease = (1-fit)/s 
         const AllelePtr genotype = indPtr->getGenotype();
         for (j = 0; j < param.loci; ++j){
             gMatrix[j][i] = genotype[j];
         }
     }
-    stats.setAveDisease(gsl_stats_mean(disease, 1, param.popsize));
-    stats.setSDDisease(gsl_stats_sd(disease, 1, param.popsize));
     GSLPTR gMean = stats.getGMean();
     GSLPTR gSD = stats.getGSD();
     GSLMATRIX gDistn = stats.getGDistn();
@@ -99,13 +95,6 @@ void Population::calcStats(Param& param, SumStat& stats)
         }
     }
     
-    qsort(disease, param.popsize, sizeof(GSL), dcompare);
-    GSLPTR diseaseDistn = stats.getDiseaseDistn();
-    GSLPTR diseaseDistnNormal = stats.getDiseaseDistnNormal();
-    for (j = 0; j < param.distnSteps; ++j){
-        diseaseDistn[j] = gsl_stats_quantile_from_sorted_data(disease, 1, param.popsize, (double)j/d);
-    }
-    
     // fitness distn
     
     qsort(fitness, param.popsize, sizeof(GSL), dcompare);
@@ -116,48 +105,12 @@ void Population::calcStats(Param& param, SumStat& stats)
         fitnessDistn[j] = gsl_stats_quantile_from_sorted_data(fitness,
                                                                   1, param.popsize, (double)j/d);
     }
-    
-    // diseaseDistn above gives percentiles for probability that individual dies of disease, 
-    // showing how much of variation in population is caused by genotype.  This distribution
-    // is easier to evaluate if normalized as follows.  For each percentile X=x*100, substitute
-    // integral(j,popsize-1){diseaseArray} / integral(0,popsize-1){diseaseArray}, 
-    // where j = x * (popsize-1).
-    // This gives the fraction of disease in the Xth or higher percentiles, eg, if X = 90, then
-    // the value is the fraction of disease in the upper 10% of the population
-    // To obtain integrals from diseaseArray[0..popsize-1], must first make interpolating spline
-    
-    double *indexArray = new double[param.popsize];
-    for (i = 0; i < param.popsize; ++i){
-        indexArray[i] = (double)i;
-    }
-    
-    gsl_interp_accel *acc = gsl_interp_accel_alloc ();
-    gsl_spline *spline = gsl_spline_alloc (gsl_interp_cspline, param.popsize);
-    gsl_spline_init (spline, indexArray, disease, param.popsize);
-    
-    double top = (double)(param.popsize-1);
-    GSL totalDisease = gsl_spline_eval_integ(spline, 0.0, top, acc); 
-    
-    for (j = 0; j < param.distnSteps; ++j){
-        if (totalDisease < 1e-6){
-            diseaseDistnNormal[j] = 0.0;
-        }
-        else{
-            GSL tmp = gsl_spline_eval_integ(spline, (j*top)/100.0, top, acc);
-            diseaseDistnNormal[j] = tmp /totalDisease;
-        }
-    }
-    
-    gsl_spline_free(spline);
-    gsl_interp_accel_free(acc);
-    
+        
     for (i = 0; i < param.loci; ++i){
         delete [] gMatrix[i];
     }
     delete [] gMatrix;
-    delete [] disease;
     delete [] fitness;
-    delete [] indexArray;
 }
 
 

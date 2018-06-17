@@ -6,6 +6,8 @@ COMMENTS:
     mut         mutation rate per allele
     rec         recombination probability between loci
     s           intensity of selection
+    maxAllele   max allelic value
+    fitVar      1/steepness of fitness gradient
 
 REPLICATES  = 1
 CONTROL PARAMETERS:
@@ -16,14 +18,12 @@ END
 DESIGN PARAMETERS:
 Param    Levels     Center     Increm  Scale
 
-gen        3        8e4          2.0     E
+gen        3        8e3          2.0     E
 loci       3        6e0          1.0     L
 popsize    3        1e4          2.0     E
 mut        1        1e-4        10.0     E
 rec        1        5e-1        10.0     E
-s          1        1e-2        10.0     E
-minFail    1        4e-1         0.1     L
-failExp    1        2e-0         2.0     E
+maxAllele  1        1e2          2.0     E
+fitVar     1        1e-2         2.0     E
 
 END
-

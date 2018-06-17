@@ -5,27 +5,22 @@
 
 FLOAT Individual::mut;
 FLOAT Individual::rec;
-FLOAT Individual::s;
-FLOAT Individual::minFail;
-FLOAT Individual::failExp;
 int Individual::totalLoci;
+Allele Individual::maxAllele;
+FLOAT Individual::fitVar;
+
 
 Individual::~Individual()
 {
     delete [] genotype;
 }
 
-void Individual::initialize(Param& param)
+void Individual::initialize()
 {
-    totalLoci = param.loci;
     genotype = new Allele[totalLoci];
-    mut = param.mutation * totalLoci;
 
-    // initialize values
-    
-    // randomly, set 95% of alleles to min failure probability, and 5% randomly on [minFail,1]
     for (int i = 0; i < totalLoci; ++i){
-        genotype[i] = static_cast<Allele>((rnd.rU01() < 0.95) ? param.minFail : param.minFail + (1-param.minFail)*rnd.rU01());
+        genotype[i] = static_cast<Allele>(rnd.rUniform(-maxAllele,maxAllele));
     }
     fitness = calcFitness();
 }
@@ -36,10 +31,9 @@ void Individual::setParam(Param& param)
 {
     mut = param.mutation;
     rec = param.recombination;
-    s = param.s;
     totalLoci = param.loci;
-    minFail = param.minFail;
-    failExp = param.failExp;
+    maxAllele = param.maxAllele;
+    fitVar = param.fitVar;
 }
 
 // mut is per genotype mutation rate
@@ -49,7 +43,7 @@ void Individual::mutate()
     ulong hits = rnd.poisson(mut);
     for (unsigned i = 0; i < hits; ++i){
         ulong locus = rnd.rtop(totalLoci);
-        genotype[locus] = static_cast<Allele>(minFail + (1.0-minFail)*rnd.rU01());  // uniform on [minFail, 1]
+        genotype[locus] = static_cast<Allele>(rnd.rUniform(-maxAllele,maxAllele));
     }
 }
 
@@ -69,22 +63,12 @@ void SetBabyGenotype(Individual& Parent1, Individual &Parent2, Individual& baby)
     baby.fitness = baby.calcFitness();
 }
 
-// s is selective coefficient for failure
-// failure at each locus is m + (1-m)*((g-m)/(1-m))^failExp
-// where m is minFail and g is genotypic value on range [m,1]
-// This gives diminishing reduction in failure rate as genotypic value declines if failExp > 1, and 
-// accelerating reduction in failure rate as genotypic value declines if failExp < 1.
-// Diminishing return tends to push all loci to intermediate value for failure rate, since further declines
-// would not give great benefits, but further increases cause large losses, like internal equilibrium
-// under diminishing returns
-
 FLOAT Individual::calcFitness()
 {
-    FLOAT probFailure = 1.0;
-    AllelePtr g = genotype;
+    FLOAT sumAllele = 0;
     for (int i = 0; i < totalLoci; ++i){
-        probFailure *= minFail + (1-minFail)*pow((*g++-minFail)/(1-minFail),failExp);
+        sumAllele += genotype[i];
     }
-    return fitness = 1.0 - s*probFailure;
+    return fitness = exp(-sumAllele*sumAllele/(2*fitVar));
 }
 

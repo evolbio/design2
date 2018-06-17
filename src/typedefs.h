@@ -2,21 +2,6 @@
 #ifndef _typedefs_h
 #define _typedefs_h 1
 
-struct Param{
-    int   runNum;
-    int   distnSteps;
-    int   gen;
-    int   loci;
-    int   popsize;
-    float mutation;
-    float recombination;
-    float s;        // strength of selection
-    float minFail;  // min failure rate per component
-    float failExp;  // exponent to scale failure rate
-};
-
-using Param = struct Param;
-
 using schar = signed char;
 using uchar = unsigned char;
 // using uint  = unsigned int;
@@ -32,5 +17,20 @@ using GSLPTR    = GSL*;
 using GSLMATRIX = GSL**;
 
 using IntMatrix = int**;
+
+struct Param{
+    int   runNum;
+    int   distnSteps;
+    int   gen;
+    int   loci;
+    int   popsize;
+    float mutation;
+    float recombination;
+    Allele maxAllele; // max allelic value
+    FLOAT fitVar;   // width of fitness gradient
+};
+
+using Param = struct Param;
+
 
 #endif

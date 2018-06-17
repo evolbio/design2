@@ -14,8 +14,6 @@ void SumStat::initialize(Param& param)
         gDistn[i] = new GSL[param.distnSteps];		// steps for percentiles
         gCorr[i] = new GSL[loci];
     }
-    diseaseDistn = new GSL[param.distnSteps];
-    diseaseDistnNormal = new GSL[param.distnSteps];
     fitnessDistn = new GSL[param.distnSteps];
 }
 
@@ -30,7 +28,5 @@ SumStat::~SumStat()
     }
     delete [] gDistn;
     delete [] gCorr;
-    delete [] diseaseDistn;
-    delete [] diseaseDistnNormal;
     delete [] fitnessDistn;
 }

@@ -82,7 +82,7 @@ void GetParam(Param& p, std::istringstream& parmBuf)
 {
     double tmpGen, tmpLoci, tmpPop;
     
-    parmBuf >> p.runNum >> tmpGen >> tmpLoci >> tmpPop >> p.mutation >> p.recombination >> p.s >> p.minFail >> p.failExp;
+    parmBuf >> p.runNum >> tmpGen >> tmpLoci >> tmpPop >> p.mutation >> p.recombination >> p.maxAllele >> p.fitVar;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
 
@@ -111,9 +111,8 @@ std::string PrintParam(Param& p)
     outString += fmt::format(format, "popSz", p.popsize);
     outString += fmt::format(formatf, "mut", p.mutation);
     outString += fmt::format(formatf, "rec", p.recombination);
-    outString += fmt::format(formatf, "s", p.s);
-    outString += fmt::format(formatf, "minFail", p.minFail);
-    outString += fmt::format(formatf, "failExp", p.failExp);
+    outString += fmt::format(formatf, "maxAllele", p.maxAllele);
+    outString += fmt::format(formatf, "fitVar", p.fitVar);
     outString += "\n";
     return outString;
 }
@@ -121,21 +120,6 @@ std::string PrintParam(Param& p)
 void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
 {
     resultss << PrintParam(param);
-    resultss << fmt::format("{}{}", "Distribution of disease frequencies,",
-                             " rows are percentiles\n");
-    resultss << fmt::format("{}", "\tFirst entry is raw value, second entry is normalized\n\n");
-    resultss << fmt::format("{:5}{:>11}{:>8}\n", "", "Raw", "Nrmlzd");
-    resultss << fmt::format("{:5}{:11.3e}{:>8}\n", " Mean", stats.getAveDisease(), "NA");
-    resultss << fmt::format("{:5}{:11.3e}{:>8}\n", "   SD", stats.getSDDisease(), "NA");
-
-    GSLPTR diseaseDistn = stats.getDiseaseDistn();
-    GSLPTR diseaseDistnNormal = stats.getDiseaseDistnNormal();
-    
-    for (int j = 0; j < param.distnSteps; ++j){
-        resultss << fmt::format("{:5.1f}", 100.0*(double)j/(double)(param.distnSteps-1));
-        resultss << fmt::format("{:11.3e}{:8.3f}\n", diseaseDistn[j],  diseaseDistnNormal[j]);
-    }
-    resultss << "\n";
 
     // print fitness distn
     
@@ -161,26 +145,26 @@ void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
     
     resultss <<  "     ";
     for (int i = 0; i < param.loci; ++i){
-        resultss << fmt::format((i < 10) ? "{:>6}{:1}" : "{:>5}{:2}", "g", i);
+        resultss << fmt::format((i < 10) ? "{:>7}{:1}" : "{:>6}{:2}", "g", i);
     }
     resultss << "\n";
     
     resultss <<  " Mean";
     for (int i = 0; i < param.loci; ++i){
-        resultss << fmt::format("{:7.3f}", gMean[i]);
+        resultss << fmt::format("{:8.3f}", gMean[i]);
     }
     resultss << "\n";
 
     resultss <<  "   SD";
     for (int i = 0; i < param.loci; ++i){
-        resultss << fmt::format("{:7.3f}", gSD[i]);
+        resultss << fmt::format("{:8.3f}", gSD[i]);
     }
     resultss << "\n";
 
     for (int j = 0; j < param.distnSteps; ++j){
         resultss << fmt::format("{:5.1f}", 100.0*(double)j/(double)(param.distnSteps-1));
         for (int i = 0; i < param.loci; ++i){
-            resultss << fmt::format("{:7.3f}", gDistn[i][j]);
+            resultss << fmt::format("{:8.3f}", gDistn[i][j]);
         }
         resultss << "\n";
     }

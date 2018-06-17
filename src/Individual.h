@@ -5,9 +5,9 @@
 #include "typedefs.h"
 #include "Individual.h"
 
-// Use float for fitness with about 6-7 places of precision because pop sizes will be less than 10^6 and so any fitness differences less than the pop size will be effectively neutral, if pop size gets to be on order of 10^6, should go to double precision.
+// Test performance for float vs double for fitness. Could use float for fitness with about 6-7 places of precision because pop sizes will be less than 10^6 and so any fitness differences less than the pop size will be effectively neutral, if pop size gets to be on order of 10^6, should go to double precision. However, performance for double may be same, and not much space taken up.
 
-// Use array of floats for genotype, each locus has a value on [0,1] which is probability of failure for that locus, phenotype is probability of failure across all loci, ie, product of probabilities across all loci; note optimum is zero.  If value at a locus is 0<=p<=1, then mutation causes new value that is worse than original, ie, p < p' <= 1, so must initialize pop with mostly 0 to provide best genotypes, and a small percentage of variable values to initialize with some variability, and let mutation cause only deterioration.
+// Use array of floats for genotype, each locus has a value on [-MAX,MAX]. For initial test problem, set phenotype, P, as sum of allelic values across all loci, and fitness as exp(-P^2/2*S^2). Then can test standard mut-selection pattern for one locus.
 
 // Each individual is haploid hermaphrodite, so no distinct sexes
 // Form diploid zygote and then make a gamete to produce haploid baby, ie, haploid dominant life cycle
@@ -22,8 +22,8 @@ class Individual
     friend void SetBabyGenotype(Individual& Parent1, Individual &Parent2, Individual& baby);
 public:
     ~Individual();
-    void			initialize(Param& param);
     void            setParam(Param& param);     // set static variables for class
+    void			initialize();
     void			mutate();
     FLOAT			calcFitness();
     FLOAT           getFitness(){return fitness;};
@@ -31,11 +31,10 @@ public:
 private:
     static FLOAT	mut;            // per genome mutation rate, param.mutation is per locus mutation rate
     static int		totalLoci;
-    static FLOAT    s;              // selection coefficient
     static FLOAT    rec;            // recombination probability
-    static FLOAT    minFail;        // minimum failure rate
-    static FLOAT    failExp;        // failure exponent scaling
-    AllelePtr 		genotype;       // array of failure probabilities, haploid so each allele is a single failure prob
+    static Allele   maxAllele;      // max allelic value
+    static FLOAT    fitVar;         // variance of fitness scaling
+    AllelePtr 		genotype;
     FLOAT           fitness;
 };
 
