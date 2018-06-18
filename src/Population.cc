@@ -14,25 +14,19 @@ int dcompare(const void *e1, const void *e2)
 Population::Population(Param& param)
 {
 	popSize = param.popsize;
-    ind = Individualvec(popSize); // new Individual[popSize];
-    cumFit = new double[popSize];
+    ind = std::vector<Individual>(popSize);
+    cumFit = std::vector<double>(popSize);
     ind[0].setParam(param);
 	for (int i = 0; i < popSize; i++){
 		ind[i].initialize();
 	}
 }
 
-Population::~Population()
-{
-    delete [] cumFit;
-}
-
 void Population::setFitnessArray()
 {
-    double *cumPtr = cumFit;
     double fit = 0;
-    for (int i = 0; i < popSize; ++i, ++cumPtr){
-        *cumPtr = fit += ind[i].getFitness();
+    for (int i = 0; i < popSize; ++i){
+        cumFit[i] = fit += ind[i].getFitness();
     }
 }
 
@@ -40,12 +34,11 @@ void Population::setFitnessArray()
 
 void Population::reproduceMutateCalcFit(Population& oldPop)
 {
-    double *cumPtr = cumFit;
     double fit = 0;
-	for (int i = 0; i < popSize; ++i, ++cumPtr){
+	for (int i = 0; i < popSize; ++i){
         SetBabyGenotype(oldPop.chooseInd(), oldPop.chooseInd(), ind[i]);
         ind[i].mutate();
-        *cumPtr = fit += ind[i].getFitness();
+        cumFit[i] = fit += ind[i].getFitness();
 	}
 }
 

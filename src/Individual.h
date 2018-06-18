@@ -21,6 +21,9 @@ class Individual
 {
     friend void SetBabyGenotype(Individual& Parent1, Individual &Parent2, Individual& baby);
 public:
+    Individual(){};
+    Individual(const Individual& other);                // copy constructor
+    Individual&     operator=(const Individual& other); // assignment constructor
     void            setParam(Param& param);     // set static variables for class
     void			initialize();
     void			mutate();

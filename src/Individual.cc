@@ -25,10 +25,31 @@ int MyRandomPoisson(double mean)
     return k-1;
 }
 
+// copy constructor
+Individual::Individual(const Individual& other)
+{
+    genotype = std::unique_ptr<Allele[]> {new Allele[totalLoci]};
+    for (int i = 0; i < totalLoci; ++i){
+        genotype[i] = other.genotype[i];
+    }
+    fitness = calcFitness();
+}
+
+// assignment constructor
+Individual& Individual::operator=(const Individual& other)
+{
+    genotype = std::unique_ptr<Allele[]> {new Allele[totalLoci]};
+    for (int i = 0; i < totalLoci; ++i){
+        genotype[i] = other.genotype[i];
+    }
+    fitness = calcFitness();
+    return *this;
+}
+
 void Individual::initialize()
 {
     genotype = std::unique_ptr<Allele[]> {new Allele[totalLoci]};
-
+    
     for (int i = 0; i < totalLoci; ++i){
         genotype[i] = static_cast<Allele>(rnd.rUniform(-maxAllele,maxAllele));
     }
