@@ -9,6 +9,21 @@ int Individual::totalLoci;
 Allele Individual::maxAllele;
 FLOAT Individual::fitVar;
 
+// Algorithm for fast Poisson for lambda < 30
+// from https://www.johndcook.com/blog/2010/06/14/generating-poisson-random-values/
+// Test measurement suggests about twice as fast as rnd.poisson()
+
+int MyRandomPoisson(double mean)
+{
+    int k = 0;
+    double p = 1.0;
+    double L = exp(-mean);
+    while (p > L){
+        k++;
+        p *= rnd.rU01();
+    }
+    return k-1;
+}
 
 Individual::~Individual()
 {
@@ -40,8 +55,9 @@ void Individual::setParam(Param& param)
 
 void Individual::mutate()
 {
-    ulong hits = rnd.poisson(mut);
-    for (unsigned i = 0; i < hits; ++i){
+    // ulong hits = rnd.poisson(mut*totalLoci);  // about twice as slow, note change in type for hits
+    int hits = MyRandomPoisson(mut*totalLoci);
+    for (int i = 0; i < hits; ++i){
         ulong locus = rnd.rtop(totalLoci);
         genotype[locus] = static_cast<Allele>(rnd.rUniform(-maxAllele,maxAllele));
     }
