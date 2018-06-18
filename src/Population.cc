@@ -14,8 +14,7 @@ int dcompare(const void *e1, const void *e2)
 Population::Population(Param& param)
 {
 	popSize = param.popsize;
-    totalLoci = param.loci;
-	ind = new Individual[popSize];
+    ind = Individualvec(popSize); // new Individual[popSize];
     cumFit = new double[popSize];
     ind[0].setParam(param);
 	for (int i = 0; i < popSize; i++){
@@ -25,17 +24,15 @@ Population::Population(Param& param)
 
 Population::~Population()
 {
-	delete [] ind;
     delete [] cumFit;
 }
 
 void Population::setFitnessArray()
 {
-    Individual *iPtr = ind;
     double *cumPtr = cumFit;
     double fit = 0;
-    for (int i = 0; i < popSize; ++i, ++iPtr, ++cumPtr){
-        *cumPtr = fit += iPtr->getFitness();
+    for (int i = 0; i < popSize; ++i, ++cumPtr){
+        *cumPtr = fit += ind[i].getFitness();
     }
 }
 
@@ -43,13 +40,12 @@ void Population::setFitnessArray()
 
 void Population::reproduceMutateCalcFit(Population& oldPop)
 {
-    Individual *iPtr = ind;
     double *cumPtr = cumFit;
     double fit = 0;
-	for (int i = 0; i < popSize; ++i, ++iPtr, ++cumPtr){
-        SetBabyGenotype(oldPop.chooseInd(), oldPop.chooseInd(), *iPtr);
-        iPtr->mutate();
-        *cumPtr = fit += iPtr->getFitness();
+	for (int i = 0; i < popSize; ++i, ++cumPtr){
+        SetBabyGenotype(oldPop.chooseInd(), oldPop.chooseInd(), ind[i]);
+        ind[i].mutate();
+        *cumPtr = fit += ind[i].getFitness();
 	}
 }
 
@@ -59,16 +55,15 @@ void Population::calcStats(Param& param, SumStat& stats)
 {
     int i, j;
     double d = param.distnSteps - 1.0;
-    Individual *indPtr = ind;
     DBLPTR fitness = new double[popSize];
     DBLMATRIX gMatrix = new DBLPTR[param.loci];
     for (i = 0; i < param.loci; ++i){
         gMatrix[i] = new double[param.popsize];
     }
     
-    for (i = 0; i < popSize; ++i, ++indPtr){
+    for (i = 0; i < popSize; ++i){
         fitness[i] = cumFit[i] - ((i>0) ? cumFit[i-1] : 0.0);
-        auto& genotype = indPtr->getGenotype();
+        auto& genotype = ind[i].getGenotype();
         for (j = 0; j < param.loci; ++j){
             gMatrix[j][i] = genotype[j];
         }

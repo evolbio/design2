@@ -9,6 +9,8 @@
 // Life cycle is make a baby, mutate the baby, calculate its fitness,
 // analyze the population characteristics every so often, reproduce
 
+using Individualvec = std::vector<Individual>;
+
 class Population
 {
 public:
@@ -23,8 +25,7 @@ public:
 private:
     int     	chooseMember(double *array, int n);
 	int 		popSize;		// # females = # males = popSize
-    int			totalLoci;      // must store for destructor
-	Individual*	ind;			// array of individuals
+    Individualvec	ind;			// vector of individuals
     double*		cumFit;         // cumfitness of individuals
 };
 
