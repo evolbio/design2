@@ -21,11 +21,11 @@ public:
 	void		reproduceMutateCalcFit(Population& oldPop);
     void		calcStats(Param& param, SumStat& stats);
 private:
-    int     	chooseMember(FLOAT *array, int n);
+    int     	chooseMember(double *array, int n);
 	int 		popSize;		// # females = # males = popSize
     int			totalLoci;      // must store for destructor
 	Individual*	ind;			// array of individuals
-    FLOAT*		cumFit;         // cumfitness of individuals
+    double*		cumFit;         // cumfitness of individuals
 };
 
 #endif

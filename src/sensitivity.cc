@@ -127,7 +127,7 @@ void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
     resultss << fmt::format("{:5}{:11.3e}\n", " Mean", stats.getAveFitness());
     resultss << fmt::format("{:5}{:11.3e}\n", "   SD", stats.getSDFitness());
     
-    GSLPTR fitness = stats.getFitnessDistn();
+    DBLPTR fitness = stats.getFitnessDistn();
     
     for (int j = 0; j < param.distnSteps; ++j){
         resultss << fmt::format("{:5.1f}", 100.0*(double)j/(double)(param.distnSteps-1));
@@ -137,9 +137,9 @@ void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
 
     // print genotype distn statistics for each locus
     
-    GSLPTR gMean = stats.getGMean();
-    GSLPTR gSD = stats.getGSD();
-    GSLMATRIX gDistn = stats.getGDistn();
+    DBLPTR gMean = stats.getGMean();
+    DBLPTR gSD = stats.getGSD();
+    DBLMATRIX gDistn = stats.getGDistn();
     
     resultss << "Distribution of genotype values, rows are percentiles\n\n";
     
@@ -173,7 +173,7 @@ void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
 
     // print G corr matrix
     
-    GSLMATRIX gCorr = stats.getGCorr();
+    DBLMATRIX gCorr = stats.getGCorr();
     
     resultss << "Correlation of G values\n\n";
     

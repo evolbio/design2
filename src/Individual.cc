@@ -3,11 +3,11 @@
 
 // declare static private member variables
 
-FLOAT Individual::mut;
-FLOAT Individual::rec;
+double Individual::mut;
+double Individual::rec;
 int Individual::totalLoci;
 Allele Individual::maxAllele;
-FLOAT Individual::fitVar;
+double Individual::fitVar;
 
 // Algorithm for fast Poisson for lambda < 30
 // from https://www.johndcook.com/blog/2010/06/14/generating-poisson-random-values/
@@ -25,14 +25,9 @@ int MyRandomPoisson(double mean)
     return k-1;
 }
 
-Individual::~Individual()
-{
-    delete [] genotype;
-}
-
 void Individual::initialize()
 {
-    genotype = new Allele[totalLoci];
+    genotype = std::unique_ptr<Allele[]> {new Allele[totalLoci]};
 
     for (int i = 0; i < totalLoci; ++i){
         genotype[i] = static_cast<Allele>(rnd.rUniform(-maxAllele,maxAllele));
@@ -65,23 +60,21 @@ void Individual::mutate()
 
 void SetBabyGenotype(Individual& Parent1, Individual &Parent2, Individual& baby)
 {
-	AllelePtr g1 = Parent1.genotype;
-	AllelePtr g2 = Parent2.genotype;
-	AllelePtr gb = baby.genotype;
+	auto& g1 = Parent1.genotype;
+	auto& g2 = Parent2.genotype;
+	auto& gb = baby.genotype;
 	ulong chrFlag = rnd.rbit();		// determines which parent is used for copying
-    FLOAT probFailure = 1.0;        // fitness is prob of not failing, which is 1 - product of failure prob
-                                    // at each locus, calc here for efficiency
 	
-	for (int i = 0; i < Parent1.totalLoci; i++, g1++, g2++, gb++){
-		probFailure *= *gb = (chrFlag) ? *g1 : *g2;
-		if (rnd.rU01() < baby.rec) chrFlag ^= 1;		// flip flag if recombination at rate 0.5
-	}
+    for (int i = 0; i < Parent1.totalLoci; ++i){
+        gb[i] = (chrFlag) ? g1[i] : g2[i];
+        if (rnd.rU01() < baby.rec) chrFlag ^= 1;        // flip flag if recombination at rate 0.5
+    }
     baby.fitness = baby.calcFitness();
 }
 
-FLOAT Individual::calcFitness()
+double Individual::calcFitness()
 {
-    FLOAT sumAllele = 0;
+    double sumAllele = 0;
     for (int i = 0; i < totalLoci; ++i){
         sumAllele += genotype[i];
     }

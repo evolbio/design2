@@ -11,25 +11,25 @@ class SumStat
 public:
     ~SumStat();
     void		initialize(Param& param);
-    GSLPTR      getGMean(){return gMean;}
-    GSLPTR      getGSD(){return gSD;}
-    GSLMATRIX	getGDistn(){return gDistn;}
-    GSLMATRIX	getGCorr(){return gCorr;}
-    GSLPTR      getFitnessDistn(){return fitnessDistn;}
-    GSL         getAveFitness(){return aveFitness;}
-    GSL         getSDFitness(){return sdFitness;}
-    void        setAveFitness(GSL x){aveFitness = x;}
-    void        setSDFitness(GSL x){sdFitness = x;}
+    DBLPTR      getGMean(){return gMean;}
+    DBLPTR      getGSD(){return gSD;}
+    DBLMATRIX	getGDistn(){return gDistn;}
+    DBLMATRIX	getGCorr(){return gCorr;}
+    DBLPTR      getFitnessDistn(){return fitnessDistn;}
+    double         getAveFitness(){return aveFitness;}
+    double         getSDFitness(){return sdFitness;}
+    void        setAveFitness(double x){aveFitness = x;}
+    void        setSDFitness(double x){sdFitness = x;}
 private:
-    GSLPTR      gMean;			// mean values of component failure rates
-    GSLPTR      gSD;			// sd values of component failure rates
-    GSLMATRIX	gDistn;			// percentiles [0..100]  for component failure rates
-    GSLMATRIX	gCorr;			// phenotypic correlation matrix for component failure rates
+    DBLPTR      gMean;			// mean values of component failure rates
+    DBLPTR      gSD;			// sd values of component failure rates
+    DBLMATRIX	gDistn;			// percentiles [0..100]  for component failure rates
+    DBLMATRIX	gCorr;			// phenotypic correlation matrix for component failure rates
     int			loci;
     int         distnSteps;     // steps in percentile distns
-    GSL         aveFitness;
-    GSL         sdFitness;
-    GSLPTR      fitnessDistn;
+    double         aveFitness;
+    double         sdFitness;
+    DBLPTR      fitnessDistn;
 };
 
 #endif

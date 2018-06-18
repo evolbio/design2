@@ -21,21 +21,20 @@ class Individual
 {
     friend void SetBabyGenotype(Individual& Parent1, Individual &Parent2, Individual& baby);
 public:
-    ~Individual();
     void            setParam(Param& param);     // set static variables for class
     void			initialize();
     void			mutate();
-    FLOAT			calcFitness();
-    FLOAT           getFitness(){return fitness;};
-    AllelePtr	    getGenotype(){return genotype;};
+    double			calcFitness();
+    double          getFitness(){return fitness;};
+    auto&   	    getGenotype(){return genotype;};
 private:
-    static FLOAT	mut;            // per genome mutation rate, param.mutation is per locus mutation rate
+    static double	mut;            // per genome mutation rate, param.mutation is per locus mutation rate
     static int		totalLoci;
-    static FLOAT    rec;            // recombination probability
+    static double   rec;            // recombination probability
     static Allele   maxAllele;      // max allelic value
-    static FLOAT    fitVar;         // variance of fitness scaling
-    AllelePtr 		genotype;
-    FLOAT           fitness;
+    static double   fitVar;         // variance of fitness scaling
+    std::unique_ptr<Allele[]> genotype;
+    double          fitness;
 };
 
 #endif

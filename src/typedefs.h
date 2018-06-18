@@ -9,12 +9,8 @@ using ulong  = unsigned long;
 
 using Allele    = float;
 using AllelePtr = Allele*;
-using FLOAT     = double;            // use double here to change to double precision
-using FLOATPTR  = FLOAT*;
-using FLTMATRIX = FLOAT**;
-using GSL       = double;           // GSL uses double, so for all stats use this type
-using GSLPTR    = GSL*;
-using GSLMATRIX = GSL**;
+using DBLPTR    = double*;
+using DBLMATRIX = double**;
 
 using IntMatrix = int**;
 
@@ -27,7 +23,7 @@ struct Param{
     float mutation;
     float recombination;
     Allele maxAllele; // max allelic value
-    FLOAT fitVar;   // width of fitness gradient
+    double fitVar;   // width of fitness gradient
 };
 
 using Param = struct Param;

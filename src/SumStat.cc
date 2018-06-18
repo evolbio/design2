@@ -6,15 +6,15 @@ void SumStat::initialize(Param& param)
     int i;
     loci = param.loci;
     distnSteps = param.distnSteps;
-    gMean = new GSL[loci];
-    gSD = new GSL[loci];
-    gDistn = new GSLPTR[loci];
-    gCorr = new GSLPTR[loci];
+    gMean = new double[loci];
+    gSD = new double[loci];
+    gDistn = new DBLPTR[loci];
+    gCorr = new DBLPTR[loci];
     for (i = 0; i < loci; ++i){
-        gDistn[i] = new GSL[param.distnSteps];		// steps for percentiles
-        gCorr[i] = new GSL[loci];
+        gDistn[i] = new double[param.distnSteps];		// steps for percentiles
+        gCorr[i] = new double[loci];
     }
-    fitnessDistn = new GSL[param.distnSteps];
+    fitnessDistn = new double[param.distnSteps];
 }
 
 SumStat::~SumStat()
