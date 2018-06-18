@@ -34,6 +34,14 @@ PLDFLAGS = `pkg-config --libs protobuf grpc++ grpc` -lgrpc++_reflection
 
 APPHEAD   = $(NAME).h
 
+# Google performance tools, see https://github.com/gperftools/gperftools
+# add -lprofiler -ltcmalloc\ to LDFLAGS
+# mkdir profile
+# turn on with environment variables
+# setenv HEAPCHECK normal; setenv HEAPPROFILE profile/heap.prof; setenv CPUPROFILE profile/cpu.prof
+# get output with pprof, e.g., pprof --text --cum sensitivity.osx profile/*
+# or pprof, e.g., pprof --pdf --cum sensitivity.osx profile/* > prof.pdf
+
 CXX = g++
 CXXFLAGS += -std=c++17      # c++1z also, but can now use c++17 explicitly
 CXXFLAGS += -pedantic -Wall -Wextra -W \
@@ -43,7 +51,7 @@ CXXFLAGS += -pedantic -Wall -Wextra -W \
   -Wcast-qual -Wconversion \
   -g $(INCFLAGS) $(DEFS) -O3 #-pg #-DDEBUG
 LDFLAGS += -L$(HOME)/sim/simlib/lib_osx -L/opt/local/lib -lfmt\
-             -lutilSAF -lboost_system-mt -lboost_filesystem-mt -lgsl -lgslcblas
+             -lutilSAF -lboost_system-mt -lboost_filesystem-mt -lgsl -lgslcblas\
 
 INCFLAGS = -I$(HOME)/sim/simlib/include -Isrc -I$(PROTO_PATH) -isystem /opt/local/include
 VPATH 	= src:$(PROTO_PATH)

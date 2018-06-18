@@ -10,3 +10,6 @@ output/*data*
 xcuserdata
 dependencies.*
 output/Exp*
+profile
+callgrind.*
+*.dSYM

@@ -1,0 +1,5 @@
+#!/bin/csh
+set echo
+cp input/random.safdesk.bak input/random.safdesk
+valgrind --tool=callgrind sensitivity.osx -s t
+
