@@ -48,7 +48,7 @@ void Population::calcStats(Param& param, SumStat& stats)
 {
     int i, j;
     double d = param.distnSteps - 1.0;
-    DBLPTR fitness = new double[popSize];
+    std::vector<double> fitness(param.popsize);
     DBLMATRIX gMatrix = new DBLPTR[param.loci];
     for (i = 0; i < param.loci; ++i){
         gMatrix[i] = new double[param.popsize];
@@ -85,12 +85,12 @@ void Population::calcStats(Param& param, SumStat& stats)
     
     // fitness distn
     
-    qsort(fitness, param.popsize, sizeof(double), dcompare);
-    stats.setAveFitness(gsl_stats_mean(fitness, 1, param.popsize));
-    stats.setSDFitness(gsl_stats_sd(fitness, 1, param.popsize));
+    std::sort(fitness.begin(),fitness.end());
+    stats.setAveFitness(gsl_stats_mean(fitness.data(), 1, param.popsize));
+    stats.setSDFitness(gsl_stats_sd(fitness.data(), 1, param.popsize));
     DBLPTR fitnessDistn = stats.getFitnessDistn();
     for (j = 0; j < param.distnSteps; ++j){
-        fitnessDistn[j] = gsl_stats_quantile_from_sorted_data(fitness,
+        fitnessDistn[j] = gsl_stats_quantile_from_sorted_data(fitness.data(),
                                                                   1, param.popsize, (double)j/d);
     }
         
@@ -98,7 +98,6 @@ void Population::calcStats(Param& param, SumStat& stats)
         delete [] gMatrix[i];
     }
     delete [] gMatrix;
-    delete [] fitness;
 }
 
 
