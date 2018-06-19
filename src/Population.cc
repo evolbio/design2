@@ -1,15 +1,6 @@
 #include "Population.h"
 #include "gsl/gsl_statistics_double.h"
 #include "gsl/gsl_spline.h"
-extern "C"{
-#include "util.h"
-};
-
-int dcompare(const void *e1, const void *e2)
-{
-    return ((*(const double *)e1) > (*(const double *)e2)) ? 1 :
-              (((*(const double *)e1) < (*(const double *)e2)) ? -1 : 0);
-}
 
 Population::Population(Param& param)
 {
@@ -49,10 +40,7 @@ void Population::calcStats(Param& param, SumStat& stats)
     int i, j;
     double d = param.distnSteps - 1.0;
     std::vector<double> fitness(param.popsize);
-    DBLMATRIX gMatrix = new DBLPTR[param.loci];
-    for (i = 0; i < param.loci; ++i){
-        gMatrix[i] = new double[param.popsize];
-    }
+    std::vector<std::vector<double>> gMatrix(param.loci,std::vector<double>(param.popsize));
     
     for (i = 0; i < popSize; ++i){
         fitness[i] = cumFit[i] - ((i>0) ? cumFit[i-1] : 0.0);
@@ -66,20 +54,20 @@ void Population::calcStats(Param& param, SumStat& stats)
     DBLMATRIX gDistn = stats.getGDistn();
     DBLMATRIX gCorr = stats.getGCorr();
     for (i = 0; i < param.loci; ++i){
-        gMean[i] = gsl_stats_mean(gMatrix[i], 1, param.popsize);
-        gSD[i] = gsl_stats_sd(gMatrix[i], 1, param.popsize);
+        gMean[i] = gsl_stats_mean(gMatrix[i].data(), 1, param.popsize);
+        gSD[i] = gsl_stats_sd(gMatrix[i].data(), 1, param.popsize);
     }
     for (i = 0; i < param.loci; ++i){
         for (j = i; j < param.loci; ++j){
-            double cov = gsl_stats_covariance(gMatrix[i], 1, gMatrix[j], 1, param.popsize);
+            double cov = gsl_stats_covariance(gMatrix[i].data(), 1, gMatrix[j].data(), 1, param.popsize);
             double prodSD = gSD[i]*gSD[j];
             gCorr[i][j] = gCorr[j][i] = (prodSD < 1e-10) ? 0.0 : cov/(prodSD);
         }
     }
     for (i = 0; i < param.loci; ++i){
-        qsort(gMatrix[i], param.popsize, sizeof(double), dcompare);
+        std::sort(gMatrix[i].begin(), gMatrix[i].end());
         for (j = 0; j < param.distnSteps; ++j){
-            gDistn[i][j] = gsl_stats_quantile_from_sorted_data(gMatrix[i], 1, param.popsize, (double)j/d);
+            gDistn[i][j] = gsl_stats_quantile_from_sorted_data(gMatrix[i].data(), 1, param.popsize, (double)j/d);
         }
     }
     
@@ -93,11 +81,6 @@ void Population::calcStats(Param& param, SumStat& stats)
         fitnessDistn[j] = gsl_stats_quantile_from_sorted_data(fitness.data(),
                                                                   1, param.popsize, (double)j/d);
     }
-        
-    for (i = 0; i < param.loci; ++i){
-        delete [] gMatrix[i];
-    }
-    delete [] gMatrix;
 }
 
 
