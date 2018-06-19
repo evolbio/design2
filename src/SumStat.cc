@@ -6,8 +6,8 @@ void SumStat::initialize(Param& param)
     int i;
     loci = param.loci;
     distnSteps = param.distnSteps;
-    gMean = new double[loci];
-    gSD = new double[loci];
+    gMean = std::vector<double>(loci);
+    gSD = std::vector<double>(loci);
     gDistn = new DBLPTR[loci];
     gCorr = new DBLPTR[loci];
     for (i = 0; i < loci; ++i){
@@ -20,8 +20,6 @@ void SumStat::initialize(Param& param)
 SumStat::~SumStat()
 {
     int i;
-    delete [] gMean;
-    delete [] gSD;
     for (i = 0; i < loci; ++i){
         delete [] gDistn[i];
         delete [] gCorr[i];

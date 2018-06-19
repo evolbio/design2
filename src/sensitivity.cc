@@ -136,8 +136,8 @@ void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
 
     // print genotype distn statistics for each locus
     
-    DBLPTR gMean = stats.getGMean();
-    DBLPTR gSD = stats.getGSD();
+    const auto& gMean = stats.getGMean();
+    const auto& gSD = stats.getGSD();
     DBLMATRIX gDistn = stats.getGDistn();
     
     resultss << "Distribution of genotype values, rows are percentiles\n\n";

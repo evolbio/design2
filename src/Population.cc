@@ -61,8 +61,8 @@ void Population::calcStats(Param& param, SumStat& stats)
             gMatrix[j][i] = genotype[j];
         }
     }
-    DBLPTR gMean = stats.getGMean();
-    DBLPTR gSD = stats.getGSD();
+    auto& gMean = stats.getGMean();
+    auto& gSD = stats.getGSD();
     DBLMATRIX gDistn = stats.getGDistn();
     DBLMATRIX gCorr = stats.getGCorr();
     for (i = 0; i < param.loci; ++i){
