@@ -1,6 +1,6 @@
 #include "Population.h"
 #include "gsl/gsl_statistics_double.h"
-#include "gsl/gsl_spline.h"
+#include "util.h"
 
 Population::Population(Param& param)
 {
@@ -33,8 +33,7 @@ void Population::reproduceMutateCalcFit(Population& oldPop)
 	}
 }
 
-// use type double here, which is type double, because double stat routines use double
-
+// gsl takes double C arrays
 void Population::calcStats(Param& param, SumStat& stats)
 {
     int i, j;
@@ -54,8 +53,8 @@ void Population::calcStats(Param& param, SumStat& stats)
     auto& gDistn = stats.getGDistn();
     auto& gCorr = stats.getGCorr();
     for (i = 0; i < param.loci; ++i){
-        gMean[i] = gsl_stats_mean(gMatrix[i].data(), 1, param.popsize);
-        gSD[i] = gsl_stats_sd(gMatrix[i].data(), 1, param.popsize);
+        gMean[i] = vecMean<double>(gMatrix[i]);
+        gSD[i] = vecSD<double>(gMatrix[i], gMean[i]);
     }
     for (i = 0; i < param.loci; ++i){
         for (j = i; j < param.loci; ++j){
@@ -74,15 +73,15 @@ void Population::calcStats(Param& param, SumStat& stats)
     // fitness distn
     
     std::sort(fitness.begin(),fitness.end());
-    stats.setAveFitness(gsl_stats_mean(fitness.data(), 1, param.popsize));
-    stats.setSDFitness(gsl_stats_sd(fitness.data(), 1, param.popsize));
+    double mean = vecMean<double>(fitness);
+    stats.setAveFitness(mean);
+    stats.setSDFitness(vecSD<double>(fitness, mean));
     auto& fitnessDistn = stats.getFitnessDistn();
     for (j = 0; j < param.distnSteps; ++j){
         fitnessDistn[j] = gsl_stats_quantile_from_sorted_data(fitness.data(),
                                                                   1, param.popsize, (double)j/d);
     }
 }
-
 
 // array is cumulative fitness or weighting, n is number of elements
 // returns random index from array sampled by cumulative success weighting
