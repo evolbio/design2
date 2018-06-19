@@ -7,6 +7,6 @@ void SumStat::initialize(Param& param)
     distnSteps = param.distnSteps;
     gMean = std::vector<double>(loci);
     gSD = std::vector<double>(loci);
-    gDistn = std::vector<std::vector<double>>(loci, std::vector<double>(param.distnSteps));
+    gDistn = std::vector<std::vector<double>>(loci);
     gCorr = std::vector<std::vector<double>>(loci, std::vector<double>(loci));
 }

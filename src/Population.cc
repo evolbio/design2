@@ -37,7 +37,6 @@ void Population::reproduceMutateCalcFit(Population& oldPop)
 void Population::calcStats(Param& param, SumStat& stats)
 {
     int i, j;
-    double d = param.distnSteps - 1.0;
     std::vector<double> fitness(param.popsize);
     std::vector<std::vector<double>> gMatrix(param.loci,std::vector<double>(param.popsize));
     
@@ -50,7 +49,6 @@ void Population::calcStats(Param& param, SumStat& stats)
     }
     auto& gMean = stats.getGMean();
     auto& gSD = stats.getGSD();
-    auto& gDistn = stats.getGDistn();
     auto& gCorr = stats.getGCorr();
     for (i = 0; i < param.loci; ++i){
         gMean[i] = vecMean<double>(gMatrix[i]);
@@ -63,11 +61,15 @@ void Population::calcStats(Param& param, SumStat& stats)
             gCorr[i][j] = gCorr[j][i] = (prodSD < 1e-10) ? 0.0 : cov/(prodSD);
         }
     }
+    
+    // distn of allelic values
+    
+    std::vector<unsigned> ptiles(param.distnSteps);
+    std::iota(ptiles.begin(), ptiles.end(), 0);     // assign [0..n-1] for distnSteps = n, use n = 101
+    auto& gDistn = stats.getGDistn();
+
     for (i = 0; i < param.loci; ++i){
-        std::sort(gMatrix[i].begin(), gMatrix[i].end());
-        for (j = 0; j < param.distnSteps; ++j){
-            gDistn[i][j] = gsl_stats_quantile_from_sorted_data(gMatrix[i].data(), 1, param.popsize, (double)j/d);
-        }
+        gDistn[i] = percentiles_interpol<std::vector<double>>(gMatrix[i], ptiles);
     }
     
     // fitness distn
@@ -76,8 +78,6 @@ void Population::calcStats(Param& param, SumStat& stats)
     stats.setAveFitness(mean);
     stats.setSDFitness(vecSD<double>(fitness, mean));
     
-    std::vector<unsigned> ptiles(param.distnSteps);
-    std::iota(ptiles.begin(), ptiles.end(), 0);     // [0..100] for distnSteps = 101
     auto& fitnessDistn = stats.getFitnessDistn();
     fitnessDistn = percentiles_interpol<std::vector<double>>(fitness, ptiles);
 }
