@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		AA175BB420D9272C008DB808 /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = util.h; path = ../../simlib/include/util.h; sourceTree = "<group>"; };
 		AA2B46C620D22A27002DDDFA /* 00_readme.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = 00_readme.txt; sourceTree = "<group>"; };
 		AA2B46C720D22A52002DDDFA /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		AA8E1E0820D3955500935CDC /* sensitivity.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sensitivity.cc; path = src/sensitivity.cc; sourceTree = "<group>"; };
@@ -16,7 +17,6 @@
 		AA8E1E0C20D3956400935CDC /* Template.design.Expt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Template.design.Expt; path = input/Template.design.Expt; sourceTree = "<group>"; };
 		AA8E1E0D20D3958600935CDC /* SAFtimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SAFtimer.h; path = ../../simlib/include/SAFtimer.h; sourceTree = "<group>"; };
 		AA8E1E0E20D3958600935CDC /* SAFrand_pcg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SAFrand_pcg.h; path = ../../simlib/include/SAFrand_pcg.h; sourceTree = "<group>"; };
-		AA8E1E0F20D3958600935CDC /* pcg_random.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pcg_random.hpp; path = ../../simlib/include/pcg_random.hpp; sourceTree = "<group>"; };
 		AAE8229720D4BC2800ADA04C /* Individual.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Individual.cc; path = src/Individual.cc; sourceTree = "<group>"; };
 		AAE8229820D4BC2800ADA04C /* Individual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Individual.h; path = src/Individual.h; sourceTree = "<group>"; };
 		AAE8229920D4CA5B00ADA04C /* design.Expt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = design.Expt; path = input/design.Expt; sourceTree = "<group>"; };
@@ -41,9 +41,9 @@
 		AA8E1E0520D3942C00935CDC /* misc */ = {
 			isa = PBXGroup;
 			children = (
-				AA8E1E0F20D3958600935CDC /* pcg_random.hpp */,
 				AA8E1E0E20D3958600935CDC /* SAFrand_pcg.h */,
 				AA8E1E0D20D3958600935CDC /* SAFtimer.h */,
+				AA175BB420D9272C008DB808 /* util.h */,
 			);
 			name = misc;
 			sourceTree = "<group>";

@@ -9,5 +9,4 @@ void SumStat::initialize(Param& param)
     gSD = std::vector<double>(loci);
     gDistn = std::vector<std::vector<double>>(loci, std::vector<double>(param.distnSteps));
     gCorr = std::vector<std::vector<double>>(loci, std::vector<double>(loci));
-    fitnessDistn = std::vector<double>(param.distnSteps);
 }

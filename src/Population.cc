@@ -58,7 +58,7 @@ void Population::calcStats(Param& param, SumStat& stats)
     }
     for (i = 0; i < param.loci; ++i){
         for (j = i; j < param.loci; ++j){
-            double cov = gsl_stats_covariance(gMatrix[i].data(), 1, gMatrix[j].data(), 1, param.popsize);
+            double cov = vecCov(gMatrix[i], gMatrix[j], gMean[i], gMean[j]);
             double prodSD = gSD[i]*gSD[j];
             gCorr[i][j] = gCorr[j][i] = (prodSD < 1e-10) ? 0.0 : cov/(prodSD);
         }
@@ -72,15 +72,14 @@ void Population::calcStats(Param& param, SumStat& stats)
     
     // fitness distn
     
-    std::sort(fitness.begin(),fitness.end());
     double mean = vecMean<double>(fitness);
     stats.setAveFitness(mean);
     stats.setSDFitness(vecSD<double>(fitness, mean));
+    
+    std::vector<unsigned> ptiles(param.distnSteps);
+    std::iota(ptiles.begin(), ptiles.end(), 0);     // [0..100] for distnSteps = 101
     auto& fitnessDistn = stats.getFitnessDistn();
-    for (j = 0; j < param.distnSteps; ++j){
-        fitnessDistn[j] = gsl_stats_quantile_from_sorted_data(fitness.data(),
-                                                                  1, param.popsize, (double)j/d);
-    }
+    fitnessDistn = percentiles_interpol<std::vector<double>>(fitness, ptiles);
 }
 
 // array is cumulative fitness or weighting, n is number of elements
