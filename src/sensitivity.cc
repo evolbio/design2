@@ -138,7 +138,7 @@ void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
     
     const auto& gMean = stats.getGMean();
     const auto& gSD = stats.getGSD();
-    DBLMATRIX gDistn = stats.getGDistn();
+    const auto& gDistn = stats.getGDistn();
     
     resultss << "Distribution of genotype values, rows are percentiles\n\n";
     
@@ -172,7 +172,7 @@ void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
 
     // print G corr matrix
     
-    DBLMATRIX gCorr = stats.getGCorr();
+    const auto& gCorr = stats.getGCorr();
     
     resultss << "Correlation of G values\n\n";
     

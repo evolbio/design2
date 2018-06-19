@@ -9,10 +9,6 @@ using ulong  = unsigned long;
 
 using Allele    = float;
 using AllelePtr = Allele*;
-using DBLPTR    = double*;
-using DBLMATRIX = double**;
-
-using IntMatrix = int**;
 
 struct Param{
     int   runNum;

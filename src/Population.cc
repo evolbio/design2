@@ -51,8 +51,8 @@ void Population::calcStats(Param& param, SumStat& stats)
     }
     auto& gMean = stats.getGMean();
     auto& gSD = stats.getGSD();
-    DBLMATRIX gDistn = stats.getGDistn();
-    DBLMATRIX gCorr = stats.getGCorr();
+    auto& gDistn = stats.getGDistn();
+    auto& gCorr = stats.getGCorr();
     for (i = 0; i < param.loci; ++i){
         gMean[i] = gsl_stats_mean(gMatrix[i].data(), 1, param.popsize);
         gSD[i] = gsl_stats_sd(gMatrix[i].data(), 1, param.popsize);

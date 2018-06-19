@@ -9,12 +9,11 @@
 class SumStat
 {
 public:
-    ~SumStat();
     void		initialize(Param& param);
     auto&       getGMean(){return gMean;}
-    auto&      getGSD(){return gSD;}
-    DBLMATRIX	getGDistn(){return gDistn;}
-    DBLMATRIX	getGCorr(){return gCorr;}
+    auto&       getGSD(){return gSD;}
+    auto&	    getGDistn(){return gDistn;}
+    auto&	    getGCorr(){return gCorr;}
     auto&       getFitnessDistn(){return fitnessDistn;}
     double      getAveFitness(){return aveFitness;}
     double      getSDFitness(){return sdFitness;}
@@ -23,8 +22,8 @@ public:
 private:
     std::vector<double> gMean;	// mean values of component failure rates
     std::vector<double> gSD;	// sd values of component failure rates
-    DBLMATRIX	gDistn;			// percentiles [0..100]  for component failure rates
-    DBLMATRIX	gCorr;			// phenotypic correlation matrix for component failure rates
+    std::vector<std::vector<double>> gDistn; // percentiles [0..100]  for component failure rates
+    std::vector<std::vector<double>> gCorr;	 // phenotypic correlation matrix for component failure rates
     int			loci;
     int         distnSteps;     // steps in percentile distns
     double      aveFitness;
