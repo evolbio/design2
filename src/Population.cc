@@ -88,7 +88,7 @@ void Population::calcStats(Param& param, SumStat& stats)
     std::sort(fitness.begin(),fitness.end());
     stats.setAveFitness(gsl_stats_mean(fitness.data(), 1, param.popsize));
     stats.setSDFitness(gsl_stats_sd(fitness.data(), 1, param.popsize));
-    DBLPTR fitnessDistn = stats.getFitnessDistn();
+    auto& fitnessDistn = stats.getFitnessDistn();
     for (j = 0; j < param.distnSteps; ++j){
         fitnessDistn[j] = gsl_stats_quantile_from_sorted_data(fitness.data(),
                                                                   1, param.popsize, (double)j/d);

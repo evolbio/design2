@@ -126,7 +126,7 @@ void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
     resultss << fmt::format("{:5}{:11.3e}\n", " Mean", stats.getAveFitness());
     resultss << fmt::format("{:5}{:11.3e}\n", "   SD", stats.getSDFitness());
     
-    DBLPTR fitness = stats.getFitnessDistn();
+    const auto& fitness = stats.getFitnessDistn();
     
     for (int j = 0; j < param.distnSteps; ++j){
         resultss << fmt::format("{:5.1f}", 100.0*(double)j/(double)(param.distnSteps-1));

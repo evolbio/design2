@@ -15,9 +15,9 @@ public:
     DBLPTR      getGSD(){return gSD;}
     DBLMATRIX	getGDistn(){return gDistn;}
     DBLMATRIX	getGCorr(){return gCorr;}
-    DBLPTR      getFitnessDistn(){return fitnessDistn;}
-    double         getAveFitness(){return aveFitness;}
-    double         getSDFitness(){return sdFitness;}
+    auto&       getFitnessDistn(){return fitnessDistn;}
+    double      getAveFitness(){return aveFitness;}
+    double      getSDFitness(){return sdFitness;}
     void        setAveFitness(double x){aveFitness = x;}
     void        setSDFitness(double x){sdFitness = x;}
 private:
@@ -27,9 +27,9 @@ private:
     DBLMATRIX	gCorr;			// phenotypic correlation matrix for component failure rates
     int			loci;
     int         distnSteps;     // steps in percentile distns
-    double         aveFitness;
-    double         sdFitness;
-    DBLPTR      fitnessDistn;
+    double      aveFitness;
+    double      sdFitness;
+    std::vector<double>      fitnessDistn;
 };
 
 #endif

@@ -14,7 +14,7 @@ void SumStat::initialize(Param& param)
         gDistn[i] = new double[param.distnSteps];		// steps for percentiles
         gCorr[i] = new double[loci];
     }
-    fitnessDistn = new double[param.distnSteps];
+    fitnessDistn = std::vector<double>(param.distnSteps);
 }
 
 SumStat::~SumStat()
@@ -28,5 +28,4 @@ SumStat::~SumStat()
     }
     delete [] gDistn;
     delete [] gCorr;
-    delete [] fitnessDistn;
 }
