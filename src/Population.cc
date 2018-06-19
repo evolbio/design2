@@ -33,7 +33,6 @@ void Population::reproduceMutateCalcFit(Population& oldPop)
 	}
 }
 
-// gsl takes double C arrays
 void Population::calcStats(Param& param, SumStat& stats)
 {
     int i, j;

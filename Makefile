@@ -84,6 +84,7 @@ include $(DEPEND)
 
 clean: 
 	-rm -f  *.o $(PROG) $(CLIENT) $(GARBAGE)
+    -rm -rf *.dSYM
 	cd $(HOME)/sim/grpcControl; $(MAKE) cleanobj
 
 help: 
