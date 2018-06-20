@@ -19,7 +19,11 @@
 
 class Individual
 {
+    // Log version when recombination is given as -log2 = 1,2,..., ie, as 1/2, 1/4, 1/8, ...
+    // Version w/one parent for no recombination, just copy parent genotype to baby
     friend void SetBabyGenotype(Individual& Parent1, Individual &Parent2, Individual& baby);
+    friend void SetBabyGenotypeLog(Individual& Parent1, Individual &Parent2, Individual& baby);
+    friend void SetBabyGenotype(Individual& Parent, Individual& baby);
 public:
     Individual(){};
     Individual(const Individual& other);                // copy constructor

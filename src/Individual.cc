@@ -79,13 +79,51 @@ void Individual::mutate()
     }
 }
 
+// No recombination, choose just one parent and copy genotype to baby
+// Maybe memcpy would be faster??
+
+void SetBabyGenotype(Individual& Parent, Individual& baby)
+{
+    for (int i = 0; i < Parent.totalLoci; ++i){
+        baby.genotype[i] = Parent.genotype[i];
+    }
+    baby.fitness = baby.calcFitness();
+}
+
+// This routine applies when -log2(rec) is integer 0,1,2,...
+// rec = 1 => -log2 rec = 0 is OK here, each successive locus chosen from alternate parent
+// assumes that random integer has random bits
+
+void SetBabyGenotypeLog(Individual& Parent1, Individual &Parent2, Individual& baby)
+{
+    auto& g1 = Parent1.genotype;
+    auto& g2 = Parent2.genotype;
+    auto& gb = baby.genotype;
+    ulong rawint = rnd.rawint();
+    ulong recShift = 2;                     // -log 2 recombination, w/ rec = (1/2, 1/4, 1/8, ...)
+    ulong mask = (1 << recShift) - 1;       // e.g., recShift = 2 => mask = 00...0011, ie, low two bits
+    ulong chrFlag = rawint & 1;             // determines initial parent w/prob = 1/2, ie, random bit
+    auto rbits = rnd.bitSize() - recShift;  // remaining bits available
+    
+    for (int i = 0; i < Parent1.totalLoci; ++i){
+        gb[i] = (chrFlag) ? g1[i] : g2[i];
+        rawint >>= recShift;                            // move used bits out
+        if ((rawint & mask) == mask) chrFlag ^= 1;      // flip flag if recombination
+        if ((rbits -= recShift) == 0){                  // reload random bits if all used up
+            rawint = rnd.rawint();                      // new random int
+            rbits = rnd.bitSize();                      // reset remaining bits left to use
+        }
+    }
+    baby.fitness = baby.calcFitness();
+}
+
 void SetBabyGenotype(Individual& Parent1, Individual &Parent2, Individual& baby)
 {
-	auto& g1 = Parent1.genotype;
-	auto& g2 = Parent2.genotype;
-	auto& gb = baby.genotype;
-	ulong chrFlag = rnd.rbit();		// determines which parent is used for copying
-	
+    auto& g1 = Parent1.genotype;
+    auto& g2 = Parent2.genotype;
+    auto& gb = baby.genotype;
+    ulong chrFlag = rnd.rbit();        // determines which parent is used for copying
+
     for (int i = 0; i < Parent1.totalLoci; ++i){
         gb[i] = (chrFlag) ? g1[i] : g2[i];
         if (rnd.rU01() < baby.rec) chrFlag ^= 1;        // flip flag if recombination at rate 0.5
