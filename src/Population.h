@@ -24,6 +24,7 @@ private:
 	int 		popSize;		// # females = # males = popSize
     std::vector<Individual>	ind;			// vector of individuals
     std::vector<double>		cumFit;         // cumfitness of individuals
+    void (*SetBaby)(Individual&, Individual&, Individual&);
 };
 
 #endif

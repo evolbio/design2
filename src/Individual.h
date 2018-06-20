@@ -16,13 +16,17 @@
 // Make global parameters as static variables for class, so can access them without always passing Param
 // Static variables must be declared in Individual.cc, and values initialized by main program
 
+class Individual;
+void SetBabyGenotype(Individual&, Individual&);
+void SetBabyGenotype(Individual&, Individual&, Individual&);
+void SetBabyGenotypeLog(Individual&, Individual&, Individual&);
 
 class Individual
 {
     // Log version when recombination is given as -log2 = 1,2,..., ie, as 1/2, 1/4, 1/8, ...
     // Version w/one parent for no recombination, just copy parent genotype to baby
-    friend void SetBabyGenotype(Individual& Parent1, Individual &Parent2, Individual& baby);
-    friend void SetBabyGenotypeLog(Individual& Parent1, Individual &Parent2, Individual& baby);
+    friend void SetBabyGenotype(Individual& Parent1, Individual& Parent2, Individual& baby);
+    friend void SetBabyGenotypeLog(Individual& Parent1, Individual& Parent2, Individual& baby);
     friend void SetBabyGenotype(Individual& Parent, Individual& baby);
 public:
     Individual(){};

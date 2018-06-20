@@ -94,7 +94,7 @@ void SetBabyGenotype(Individual& Parent, Individual& baby)
 // rec = 1 => -log2 rec = 0 is OK here, each successive locus chosen from alternate parent
 // assumes that random integer has random bits
 
-void SetBabyGenotypeLog(Individual& Parent1, Individual &Parent2, Individual& baby)
+void SetBabyGenotypeLog(Individual& Parent1, Individual& Parent2, Individual& baby)
 {
     auto& g1 = Parent1.genotype;
     auto& g2 = Parent2.genotype;
@@ -117,7 +117,7 @@ void SetBabyGenotypeLog(Individual& Parent1, Individual &Parent2, Individual& ba
     baby.fitness = baby.calcFitness();
 }
 
-void SetBabyGenotype(Individual& Parent1, Individual &Parent2, Individual& baby)
+void SetBabyGenotype(Individual& Parent1, Individual& Parent2, Individual& baby)
 {
     auto& g1 = Parent1.genotype;
     auto& g2 = Parent2.genotype;

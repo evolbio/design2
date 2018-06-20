@@ -26,8 +26,9 @@ void Population::setFitnessArray()
 void Population::reproduceMutateCalcFit(Population& oldPop)
 {
     double fit = 0;
+    SetBaby = &SetBabyGenotypeLog;
 	for (int i = 0; i < popSize; ++i){
-        SetBabyGenotype(oldPop.chooseInd(), oldPop.chooseInd(), ind[i]);
+        SetBaby(oldPop.chooseInd(), oldPop.chooseInd(), ind[i]);
         ind[i].mutate();
         cumFit[i] = fit += ind[i].getFitness();
 	}
