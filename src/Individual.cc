@@ -8,6 +8,7 @@ double Individual::rec;
 int Individual::totalLoci;
 Allele Individual::maxAllele;
 double Individual::fitVar;
+ulong Individual::negLog2Rec;
 
 // Algorithm for fast Poisson for lambda < 30
 // from https://www.johndcook.com/blog/2010/06/14/generating-poisson-random-values/
@@ -65,6 +66,7 @@ void Individual::setParam(Param& param)
     totalLoci = param.loci;
     maxAllele = param.maxAllele;
     fitVar = param.fitVar;
+    negLog2Rec = 1;         // set elsewhere when needed, here is just default value
 }
 
 // mut is per genotype mutation rate
@@ -77,44 +79,6 @@ void Individual::mutate()
         ulong locus = rnd.rtop(totalLoci);
         genotype[locus] = static_cast<Allele>(rnd.rUniform(-maxAllele,maxAllele));
     }
-}
-
-// No recombination, choose just one parent and copy genotype to baby
-// Maybe memcpy would be faster??
-
-void SetBabyGenotype(Individual& Parent, Individual& baby)
-{
-    for (int i = 0; i < Parent.totalLoci; ++i){
-        baby.genotype[i] = Parent.genotype[i];
-    }
-    baby.fitness = baby.calcFitness();
-}
-
-// This routine applies when -log2(rec) is integer 0,1,2,...
-// rec = 1 => -log2 rec = 0 is OK here, each successive locus chosen from alternate parent
-// assumes that random integer has random bits
-
-void SetBabyGenotypeLog(Individual& Parent1, Individual& Parent2, Individual& baby)
-{
-    auto& g1 = Parent1.genotype;
-    auto& g2 = Parent2.genotype;
-    auto& gb = baby.genotype;
-    ulong rawint = rnd.rawint();
-    ulong recShift = 2;                     // -log 2 recombination, w/ rec = (1/2, 1/4, 1/8, ...)
-    ulong mask = (1 << recShift) - 1;       // e.g., recShift = 2 => mask = 00...0011, ie, low two bits
-    ulong chrFlag = rawint & 1;             // determines initial parent w/prob = 1/2, ie, random bit
-    auto rbits = rnd.bitSize() - recShift;  // remaining bits available
-    
-    for (int i = 0; i < Parent1.totalLoci; ++i){
-        gb[i] = (chrFlag) ? g1[i] : g2[i];
-        rawint >>= recShift;                            // move used bits out
-        if ((rawint & mask) == mask) chrFlag ^= 1;      // flip flag if recombination
-        if ((rbits -= recShift) == 0){                  // reload random bits if all used up
-            rawint = rnd.rawint();                      // new random int
-            rbits = rnd.bitSize();                      // reset remaining bits left to use
-        }
-    }
-    baby.fitness = baby.calcFitness();
 }
 
 void SetBabyGenotype(Individual& Parent1, Individual& Parent2, Individual& baby)
@@ -130,6 +94,43 @@ void SetBabyGenotype(Individual& Parent1, Individual& Parent2, Individual& baby)
     }
     baby.fitness = baby.calcFitness();
 }
+
+void SetBabyGenotypeLogRec(Individual& Parent1, Individual& Parent2, Individual& baby)
+{
+    auto& g1 = Parent1.genotype;
+    auto& g2 = Parent2.genotype;
+    auto& gb = baby.genotype;
+    ulong rawint = rnd.rawint();
+    ulong recShift = Individual::negLog2Rec; // -log 2 rec, w/rec = (1/2, 1/4, 1/8, ...), set in Popul
+    ulong mask = (1 << recShift) - 1;        // e.g., recShift = 2 => mask = 00...0011, ie, low two bits
+    ulong chrFlag = rawint & 1;              // determines initial parent w/prob = 1/2, ie, random bit
+    auto rbits = rnd.bitSize() - recShift;   // remaining bits available
+    
+    for (int i = 0; i < Parent1.totalLoci; ++i){
+        gb[i] = (chrFlag) ? g1[i] : g2[i];
+        rawint >>= recShift;                            // move used bits out
+        if ((rawint & mask) == mask) chrFlag ^= 1;      // flip flag if recombination
+        if ((rbits -= recShift) == 0){                  // reload random bits if all used up
+            rawint = rnd.rawint();                      // new random int
+            rbits = rnd.bitSize();                      // reset remaining bits left to use
+        }
+    }
+    baby.fitness = baby.calcFitness();
+}
+
+// No recombination, choose just one parent and copy genotype to baby. Maybe memcpy would be faster?? Note how to turn off warning for unused parameter
+
+void SetBabyGenotypeNoRec(Individual& Parent, Individual& Unused __attribute__((unused)), Individual& baby)
+{
+    for (int i = 0; i < Parent.totalLoci; ++i){
+        baby.genotype[i] = Parent.genotype[i];
+    }
+    baby.fitness = baby.calcFitness();
+}
+
+// This routine applies when -log2(rec) is integer 0,1,2,...
+// rec = 1 => -log2 rec = 0 is OK here, each successive locus chosen from alternate parent
+// assumes that random integer has random bits
 
 double Individual::calcFitness()
 {

@@ -1,5 +1,6 @@
+#include <cmath>
+
 #include "Population.h"
-#include "gsl/gsl_statistics_double.h"
 #include "util.h"
 
 Population::Population(Param& param)
@@ -11,6 +12,16 @@ Population::Population(Param& param)
 	for (int i = 0; i < popSize; i++){
 		ind[i].initialize();
 	}
+    auto rec = param.recombination;
+    double logRec;
+    if (rec < 1e-7)
+        SetBaby = SetBabyGenotypeNoRec;
+    else if (fmod(logRec = -log2(rec),1) < 1e-4){
+        SetBaby = SetBabyGenotypeLogRec;
+        ind[0].setNegLog2Rec(round<ulong>(logRec));
+    }
+    else
+        SetBaby = SetBabyGenotype;
 }
 
 void Population::setFitnessArray()
@@ -26,7 +37,6 @@ void Population::setFitnessArray()
 void Population::reproduceMutateCalcFit(Population& oldPop)
 {
     double fit = 0;
-    SetBaby = &SetBabyGenotypeLog;
 	for (int i = 0; i < popSize; ++i){
         SetBaby(oldPop.chooseInd(), oldPop.chooseInd(), ind[i]);
         ind[i].mutate();

@@ -17,22 +17,27 @@
 // Static variables must be declared in Individual.cc, and values initialized by main program
 
 class Individual;
-void SetBabyGenotype(Individual&, Individual&);
+
+// must declare in general scope to use pointer to function later
+// Log version when recombination is given as -log2 = 1,2,..., ie, as 1/2, 1/4, 1/8, ...
+// No recombination version, just copy parent genotype to baby
+// No recombination, have Unused parameter so all functions have same args
+
 void SetBabyGenotype(Individual&, Individual&, Individual&);
-void SetBabyGenotypeLog(Individual&, Individual&, Individual&);
+void SetBabyGenotypeLogRec(Individual&, Individual&, Individual&);
+void SetBabyGenotypeNoRec(Individual&, Individual& Unused, Individual&);
 
 class Individual
 {
-    // Log version when recombination is given as -log2 = 1,2,..., ie, as 1/2, 1/4, 1/8, ...
-    // Version w/one parent for no recombination, just copy parent genotype to baby
     friend void SetBabyGenotype(Individual& Parent1, Individual& Parent2, Individual& baby);
-    friend void SetBabyGenotypeLog(Individual& Parent1, Individual& Parent2, Individual& baby);
-    friend void SetBabyGenotype(Individual& Parent, Individual& baby);
+    friend void SetBabyGenotypeLogRec(Individual& Parent1, Individual& Parent2, Individual& baby);
+    friend void SetBabyGenotypeNoRec(Individual& Parent, Individual& Unused, Individual& baby);
 public:
     Individual(){};
     Individual(const Individual& other);                // copy constructor
     Individual&     operator=(const Individual& other); // assignment constructor
     void            setParam(Param& param);     // set static variables for class
+    void            setNegLog2Rec(ulong r) {negLog2Rec = r;};
     void			initialize();
     void			mutate();
     double			calcFitness();
@@ -42,6 +47,7 @@ private:
     static double	mut;            // per genome mutation rate, param.mutation is per locus mutation rate
     static int		totalLoci;
     static double   rec;            // recombination probability
+    static ulong    negLog2Rec;     // -log2 recombination, used when rec = 1, 1/2, 1/4, ...
     static Allele   maxAllele;      // max allelic value
     static double   fitVar;         // variance of fitness scaling
     std::unique_ptr<Allele[]> genotype;
