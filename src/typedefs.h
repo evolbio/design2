@@ -20,6 +20,7 @@ struct Param{
     float recombination;
     Allele maxAllele; // max allelic value
     double fitVar;   // width of fitness gradient
+    std::string rec;
 };
 
 using Param = struct Param;

@@ -5,7 +5,9 @@
 
 Population::Population(Param& param)
 {
-	popSize = param.popsize;
+    static bool flag = true;
+    std::string showRec;
+    popSize = param.popsize;
     ind = std::vector<Individual>(popSize);
     cumFit = std::vector<double>(popSize);
     ind[0].setParam(param);
@@ -13,15 +15,28 @@ Population::Population(Param& param)
 		ind[i].initialize();
 	}
     auto rec = param.recombination;
-    double logRec;
-    if (rec < 1e-7)
+    double logRec = -log2(rec);
+    ulong logRecRound = round<ulong>(logRec);
+    if (rec < 1e-7){
         SetBaby = SetBabyGenotypeNoRec;
-    else if (fmod(logRec = -log2(rec),1) < 1e-4){
-        SetBaby = SetBabyGenotypeLogRec;
-        ind[0].setNegLog2Rec(round<ulong>(logRec));
+        showRec = "Rec: no recombination\n";
+        param.rec = "None";
     }
-    else
+    else if (abs(logRec - logRecRound) < 1e-2){
+        SetBaby = SetBabyGenotypeLogRec;
+        ind[0].setNegLog2Rec(logRecRound);
+        showRec = fmt::format("Rec: using Log = {} -> {}\n", logRec,logRecRound);
+        param.rec = fmt::format("Log {}", logRecRound);
+    }
+    else{
         SetBaby = SetBabyGenotype;
+        showRec = fmt::format("Rec: using Uniform, Log = {}\n", logRec);
+        param.rec = "Uniform";
+    }
+    if (flag && showProgress){
+        flag=false;
+        std::cout << showRec;
+    }
 }
 
 void Population::setFitnessArray()

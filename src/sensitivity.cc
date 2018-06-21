@@ -110,6 +110,7 @@ std::string PrintParam(Param& p)
     outString += fmt::format(format, "popSz", p.popsize);
     outString += fmt::format(formatf, "mut", p.mutation);
     outString += fmt::format(formatf, "rec", p.recombination);
+    outString += fmt::format(format, "recT", p.rec);
     outString += fmt::format(formatf, "maxAllele", p.maxAllele);
     outString += fmt::format(formatf, "fitVar", p.fitVar);
     outString += "\n";
