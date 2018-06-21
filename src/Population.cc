@@ -124,7 +124,7 @@ int Population::chooseMember(double *array, int n)
     return ++k;
 }
 
-// lower_bound does binary search to find iterator to least index that is >= target, distance gives the index value as an int, and then call ind[] to get individual associated with index, slower than my chooseMember code, not used but shown here to document alternative algorithms
+// lower_bound does binary search to find iterator to least index that is >= target, distance gives the index value as an int, and then call ind[] to get individual associated with index, slower than my chooseMember code, not used but shown here to document alternative algorithms. Tested and gives same output as chooseMember. Test done with code as inlined in Population.h, but still much slower than chooseMember.
 
 //Individual& Population::chooseInd()
 //{
