@@ -107,16 +107,15 @@ void Population::calcStats(Param& param, SumStat& stats)
     fitnessDistn = percentiles_interpol<std::vector<double>>(fitness, ptiles);
 }
 
-// array is cumulative fitness or weighting, n is number of elements
-// returns random index from array sampled by cumulative success weighting
+// array is cumulative fitness or weighting, n is number of elements, returns random index from array sampled by cumulative success weighting, this is faster than using std::lower_bound as binary search, see below
 
 int Population::chooseMember(double *array, int n)
 {
-    double ran = rnd.rU01();
     double cumFitness = array[n-1];
     if (cumFitness < 1e-8)
         return static_cast<int>(rnd.rtop(n));
-
+    
+    double ran = rnd.rU01();
     double target = ran * cumFitness;
     int k = static_cast<int>((ran * (n-1)));
 
@@ -124,3 +123,14 @@ int Population::chooseMember(double *array, int n)
     while ((--k != -1) && (array[k] >= target));
     return ++k;
 }
+
+// lower_bound does binary search to find iterator to least index that is >= target, distance gives the index value as an int, and then call ind[] to get individual associated with index, slower than my chooseMember code, not used but shown here to document alternative algorithms
+
+//Individual& Population::chooseInd()
+//{
+//    auto it = std::lower_bound(cumFit.begin(), cumFit.end(), rnd.rU01() * cumFit.back());
+//    return ind[std::distance(cumFit.begin(), it)];
+//}
+
+
+

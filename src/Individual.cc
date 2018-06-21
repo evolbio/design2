@@ -81,6 +81,8 @@ void Individual::mutate()
     }
 }
 
+// Possible modification: For example, if rec = 0.4, then use 10/25 to test, ie, use random numbers on [0..24] and success if random number is <= 9. Not sure how much performance boost would be obtained. Would only need five bits to generate random number, so could use bit operations on 64 bit random number.
+
 void SetBabyGenotype(Individual& Parent1, Individual& Parent2, Individual& baby)
 {
     auto& g1 = Parent1.genotype;
