@@ -54,7 +54,7 @@ CXXFLAGS += -pedantic -Wall -Wextra -W \
   -Wpointer-arith -Wcast-align \
   -Wwrite-strings -Wstrict-prototypes \
   -Wcast-qual -Wconversion \
--g $(INCFLAGS) $(DEFS) #-O3 #-pg #-DDEBUG
+  -g $(INCFLAGS) $(DEFS) -O3 #-pg #-DDEBUG
 LDFLAGS += -L$(HOME)/sim/simlib/lib_osx -L/opt/local/lib -lfmt\
              -lutilSAF -lboost_system-mt -lboost_filesystem-mt -lgsl -lgslcblas\
 
@@ -90,12 +90,16 @@ depend:
 
 include $(DEPEND)
 
-clean: 
+clean:
 	-rm -f  *.o $(PROG) $(CLIENT) $(GARBAGE)
 	-rm -rf *.dSYM
-	cd $(HOME)/sim/grpcControl; $(MAKE) cleanobj
 
-help: 
+cleanproto: 
+	cd $(HOME)/sim/grpcControl; $(MAKE) cleanobj
+	
+cleanall: clean cleanproto
+
+help:
 	@echo '  make $(NAME) -  to make the application for running'
 	@echo '  make clean -    to remove all files but the source'
 	@echo '  reset flags for debugging or profiling'

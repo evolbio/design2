@@ -15,15 +15,19 @@ public:
 	Population(Param& param);
 	int			getPopSize(){return popSize;}
 	Individual&	getInd(int i){return ind[i];}
-    Individual& chooseInd(){return ind[chooseMember(cumFit.data(),popSize)];}
+    Individual& chooseInd(){return ind[getRandIndex()];}
     void		setFitnessArray();
 	void		reproduceMutateCalcFit(Population& oldPop);
     void		calcStats(Param& param, SumStat& stats);
+    void        createAliasTable(const double *pp, uint64_t *h, std::uint32_t *a, uint32_t popsize);
 private:
     int     	chooseMember(double *array, int n);
 	int 		popSize;		// # females = # males = popSize
     std::vector<Individual>	ind;			// vector of individuals
-    std::vector<double>		cumFit;         // cumfitness of individuals
+    std::vector<double>		indFitness;     // fitness of individuals
+    std::vector<uint64_t>   hvec;
+    std::vector<uint32_t>   avec;
+    uint32_t getRandIndex();
     void (*SetBaby)(Individual&, Individual&, Individual&);
 };
 
