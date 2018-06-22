@@ -7,16 +7,21 @@ SYSTEM ?= $(HOST_SYSTEM)
 
 NAME = sensitivity
 
+# Use PSUFFIX for executable, for debugging under XCode, cannot have suffix,
+# so leave PSUFFIX blank for debugging
+
 ifeq ($(SYSTEM),Darwin)
-SUFFIX  = osx
+SUFFIX  = .osx
+PSUFFIX =
 endif
 
 ifeq ($(SYSTEM),Linux)
-SUFFIX  = il
+SUFFIX  = .il
+PSUFFIX = .il
 endif
 
-PROG    = $(NAME).$(SUFFIX)
-DEPEND  = src/dependencies.$(SUFFIX)
+PROG    = $(NAME)$(PSUFFIX)
+DEPEND  = src/dependencies$(SUFFIX)
 
 CXXFILES   =  $(NAME).cc Individual.cc Population.cc SumStat.cc
 OBJFILES   = $(CXXFILES:.cc=.o)
@@ -26,7 +31,7 @@ OBJFILES   = $(CXXFILES:.cc=.o)
 # proto directory
 OCLIENT    = sim_client.o
 CXXCLIENT  = src/sim_client.cc
-CLIENT     = $(NAME)_client.$(SUFFIX)
+CLIENT     = $(NAME)_client$(SUFFIX)
 DEFS       = -DCLIENT_LINK
 PROTO_PATH = proto
 POBJFILES = $(PROTO_PATH)/simcontrol.pb.o $(PROTO_PATH)/simcontrol.grpc.pb.o
@@ -49,7 +54,7 @@ CXXFLAGS += -pedantic -Wall -Wextra -W \
   -Wpointer-arith -Wcast-align \
   -Wwrite-strings -Wstrict-prototypes \
   -Wcast-qual -Wconversion \
--g $(INCFLAGS) $(DEFS) -O3 #-pg #-DDEBUG
+-g $(INCFLAGS) $(DEFS) #-O3 #-pg #-DDEBUG
 LDFLAGS += -L$(HOME)/sim/simlib/lib_osx -L/opt/local/lib -lfmt\
              -lutilSAF -lboost_system-mt -lboost_filesystem-mt -lgsl -lgslcblas\
 
@@ -58,12 +63,15 @@ VPATH 	= src:$(PROTO_PATH)
 GARBAGE = core error.* 
 PWD := $(shell pwd)
 
-.PHONY: $(NAME)
-$(NAME):
+.PHONY: $(NAME).first
+$(NAME).first:
 	$(MAKE) $(PROG) $(MFLAGS) "CXXFLAGS = $(CXXFLAGS) -DAPPL_H=\\\"$(APPHEAD)\\\""
 
 $(PROG): $(OBJFILES) main-alone.o
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJFILES) main-alone.o $(LDFLAGS)
+
+debug: $(PROG)
+	dsymutil $(PROG)
 
 client: proto $(CLIENT)
 

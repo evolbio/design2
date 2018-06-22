@@ -77,10 +77,10 @@
 /* End PBXGroup section */
 
 /* Begin PBXLegacyTarget section */
-		AA2B46C020D22840002DDDFA /* sensitivity */ = {
+		AA68C0CB20DCA5D900F3FDA1 /* sensitivity */ = {
 			isa = PBXLegacyTarget;
 			buildArgumentsString = "$(ACTION)";
-			buildConfigurationList = AA2B46C320D22840002DDDFA /* Build configuration list for PBXLegacyTarget "sensitivity" */;
+			buildConfigurationList = AA68C0CC20DCA5D900F3FDA1 /* Build configuration list for PBXLegacyTarget "sensitivity" */;
 			buildPhases = (
 			);
 			buildToolPath = /usr/bin/make;
@@ -88,7 +88,7 @@
 			);
 			name = sensitivity;
 			passBuildSettingsInEnvironment = 1;
-			productName = sensitivity;
+			productName = sensitivity.osx;
 		};
 /* End PBXLegacyTarget section */
 
@@ -99,8 +99,8 @@
 				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = "Steven Frank";
 				TargetAttributes = {
-					AA2B46C020D22840002DDDFA = {
-						CreatedOnToolsVersion = 9.4;
+					AA68C0CB20DCA5D900F3FDA1 = {
+						CreatedOnToolsVersion = 9.4.1;
 					};
 				};
 			};
@@ -112,10 +112,11 @@
 				en,
 			);
 			mainGroup = AA2B46BB20D22840002DDDFA;
+			productRefGroup = AA2B46BB20D22840002DDDFA;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				AA2B46C020D22840002DDDFA /* sensitivity */,
+				AA68C0CB20DCA5D900F3FDA1 /* sensitivity */,
 			);
 		};
 /* End PBXProject section */
@@ -224,7 +225,7 @@
 			};
 			name = Release;
 		};
-		AA2B46C420D22840002DDDFA /* Debug */ = {
+		AA68C0CD20DCA5D900F3FDA1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -238,7 +239,7 @@
 			};
 			name = Debug;
 		};
-		AA2B46C520D22840002DDDFA /* Release */ = {
+		AA68C0CE20DCA5D900F3FDA1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -261,11 +262,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AA2B46C320D22840002DDDFA /* Build configuration list for PBXLegacyTarget "sensitivity" */ = {
+		AA68C0CC20DCA5D900F3FDA1 /* Build configuration list for PBXLegacyTarget "sensitivity" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				AA2B46C420D22840002DDDFA /* Debug */,
-				AA2B46C520D22840002DDDFA /* Release */,
+				AA68C0CD20DCA5D900F3FDA1 /* Debug */,
+				AA68C0CE20DCA5D900F3FDA1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
