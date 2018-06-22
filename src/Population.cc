@@ -55,7 +55,7 @@ void Population::setFitnessArray()
 
 void Population::reproduceMutateCalcFit(Population& oldPop)
 {
-    oldPop.createAliasTable(indFitness.data(), hvec.data(), avec.data(), popSize);
+    oldPop.createAliasTable();
     for (int i = 0; i < popSize; ++i){
         SetBaby(oldPop.chooseInd(), oldPop.chooseInd(), ind[i]);
         ind[i].mutate();
@@ -118,7 +118,12 @@ uint32_t Population::getRandIndex(){
     return (u < hvec[x]) ? x : avec[x];
 }
 
-void Population::createAliasTable(const double *pp, uint64_t *h, std::uint32_t *a, uint32_t n) {
+void Population::createAliasTable() {
+    const double *pp = indFitness.data();
+    uint64_t *h = hvec.data();
+    std::uint32_t *a = avec.data();
+    uint32_t n = popSize;
+    
     // normalize pp and copy into buffer
     double f = 0.0;
     std::vector<double> p(n);

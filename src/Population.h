@@ -19,7 +19,7 @@ public:
     void		setFitnessArray();
 	void		reproduceMutateCalcFit(Population& oldPop);
     void		calcStats(Param& param, SumStat& stats);
-    void        createAliasTable(const double *pp, uint64_t *h, std::uint32_t *a, uint32_t popsize);
+    void        createAliasTable();
 private:
     int     	chooseMember(double *array, int n);
 	int 		popSize;		// # females = # males = popSize
