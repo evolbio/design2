@@ -172,30 +172,3 @@ void Population::createAliasTable(const double *pp, uint64_t *h, std::uint32_t *
     }
 }
 
-// array is cumulative fitness or weighting, n is number of elements, returns random index from array sampled by cumulative success weighting, this is faster than using std::lower_bound as binary search, see below
-
-int Population::chooseMember(double *array, int n)
-{
-    double cumFitness = array[n-1];
-    if (cumFitness < 1e-8)
-        return static_cast<int>(rnd.rtop(n));
-    
-    double ran = rnd.rU01();
-    double target = ran * cumFitness;
-    int k = static_cast<int>((ran * (n-1)));
-    
-    while (array[k++] < target);
-    while ((--k != -1) && (array[k] >= target));
-    return ++k;
-}
-
-// lower_bound does binary search to find iterator to least index that is >= target, distance gives the index value as an int, and then call ind[] to get individual associated with index, slower than my chooseMember code, not used but shown here to document alternative algorithms. Tested and gives same output as chooseMember. Test done with code as inlined in Population.h, but still much slower than chooseMember.
-
-//Individual& Population::chooseInd()
-//{
-//    auto it = std::lower_bound(indFitness.begin(), indFitness.end(), rnd.rU01() * indFitness.back());
-//    return ind[std::distance(indFitness.begin(), it)];
-//}
-
-
-
