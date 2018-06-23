@@ -45,9 +45,8 @@ Population::Population(Param& param)
 
 void Population::setFitnessArray()
 {
-    double fit = 0;
     for (int i = 0; i < popSize; ++i){
-        indFitness[i] = fit = ind[i].getFitness();
+        indFitness[i] = ind[i].getFitness();
     }
 }
 

@@ -33,7 +33,7 @@ std::string Control(std::istringstream& parmBuf)
 {
     Param param;		
     int i, first, last;
-    unsigned seed;
+    rndType seed;
     std::ostringstream resultss;
     
     std::string temp{parmBuf.str()};
@@ -89,8 +89,8 @@ void GetParam(Param& p, std::istringstream& parmBuf)
     p.loci = round<int>(tmpLoci);
     p.popsize = round<int>(tmpPop);
     
-    int newseed;
-    unsigned parmSeed;
+    rndType newseed;
+    rndType parmSeed;
     parmBuf >> p.distnSteps >> parmSeed >> newseed;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");

@@ -58,9 +58,11 @@ int main(int argc, char *argv[])
         std::ifstream paramFile;
         std::fstream randFile;
         std::ofstream outFile;
+        std::istringstream parmBuf;
         InitRuns(first, last, randFile, paramFile, outFile, exp);
         for (i = first; i <= last; ++i){
-            std::istringstream parmBuf{WriteParmBuf(i, randFile, paramFile)};
+            parmBuf.clear();        // must reset before reloading
+            parmBuf.str(WriteParmBuf(i, randFile, paramFile));
             std::string result = Control(parmBuf);
             outFile << result;
             outFile.flush();
@@ -79,7 +81,7 @@ std::string WriteParmBuf(int first, std::fstream& randFile, std::ifstream& param
 {
     randFile.seekg(0);
     std::string tmp;
-    unsigned long seed;
+    rndType seed;
     for (unsigned i = 0; i < 11; ++i) randFile >> tmp;
     randFile >> seed;
     std::string buf;

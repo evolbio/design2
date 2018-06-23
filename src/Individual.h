@@ -43,6 +43,8 @@ public:
     double			calcFitness();
     double          getFitness(){return fitness;};
     auto&   	    getGenotype(){return genotype;};
+    Allele          mutUniform();
+    Allele          mutStep(Allele a);
 private:
     static double	mut;            // per genome mutation rate, param.mutation is per locus mutation rate
     static int		totalLoci;

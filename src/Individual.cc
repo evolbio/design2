@@ -52,7 +52,7 @@ void Individual::initialize()
     genotype = std::unique_ptr<Allele[]> {new Allele[totalLoci]};
     
     for (int i = 0; i < totalLoci; ++i){
-        genotype[i] = static_cast<Allele>(rnd.rUniform(-maxAllele,maxAllele));
+        genotype[i] = mutUniform();
     }
     fitness = calcFitness();
 }
@@ -69,6 +69,20 @@ void Individual::setParam(Param& param)
     negLog2Rec = 1;         // set elsewhere when needed, here is just default value
 }
 
+Allele Individual::mutUniform()
+{
+    return static_cast<Allele>(rnd.rUniform(-maxAllele,maxAllele));
+}
+
+// could use bit cache for random bits to speed up
+
+Allele Individual::mutStep(Allele a)
+{
+    const Allele d = (Allele)1.0;
+    Allele c = (rnd.rbit()) ? -d : d;
+    return a + c;
+}
+
 // mut is per genotype mutation rate
 
 void Individual::mutate()
@@ -77,7 +91,8 @@ void Individual::mutate()
     int hits = MyRandomPoisson(mut*totalLoci);
     for (int i = 0; i < hits; ++i){
         ulong locus = rnd.rtop(totalLoci);
-        genotype[locus] = static_cast<Allele>(rnd.rUniform(-maxAllele,maxAllele));
+        genotype[locus] = mutStep(genotype[locus]);
+        //genotype[locus] = mutUniform();
     }
 }
 
