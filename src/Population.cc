@@ -59,7 +59,20 @@ void Population::reproduceMutateCalcFit(Population& oldPop)
         SetBaby(oldPop.chooseInd(), oldPop.chooseInd(), ind[i]);
         ind[i].mutate();
         indFitness[i] = ind[i].getFitness();
-	}
+    }
+}
+
+// Round of reproduction without mutation or recombination, useful for testing models in which final population for stats is a population formed after selection but before recombination or mutation
+
+void Population::reproduceNoMutRec(Population& oldPop)
+{
+    auto r = ind[0].getRecombination();
+    oldPop.createAliasTable();
+    for (int i = 0; i < popSize; ++i){
+        SetBaby(oldPop.chooseInd(), oldPop.chooseInd(), ind[i]);
+        indFitness[i] = ind[i].getFitness();
+    }
+    ind[0].setRecombination(r);
 }
 
 void Population::calcStats(Param& param, SumStat& stats)

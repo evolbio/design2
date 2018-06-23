@@ -18,6 +18,7 @@ public:
     Individual& chooseInd(){return ind[getRandIndex()];}
     void		setFitnessArray();
 	void		reproduceMutateCalcFit(Population& oldPop);
+    void        reproduceNoMutRec(Population& oldPop);
     void		calcStats(Param& param, SumStat& stats);
     void        createAliasTable();
 private:

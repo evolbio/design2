@@ -73,7 +73,9 @@ void LifeCycle(Param& param, std::ostringstream& resultss)
         op = np;
         np = swap;
     }
-    op->calcStats(param, stats);
+    // run round of selection without mutation or recombination before collecting stats
+    np->reproduceNoMutRec(*op);
+    np->calcStats(param, stats);
     PrintSummary(param, resultss, stats);
 }
 

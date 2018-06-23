@@ -40,6 +40,8 @@ public:
     void            setNegLog2Rec(ulong r) {negLog2Rec = r;};
     void			initialize();
     void			mutate();
+    auto            getRecombination(){return rec;}
+    void            setRecombination(double r){rec = r;}
     double			calcFitness();
     double          getFitness(){return fitness;};
     auto&   	    getGenotype(){return genotype;};
