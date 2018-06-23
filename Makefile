@@ -54,7 +54,7 @@ CXXFLAGS += -pedantic -Wall -Wextra -W \
   -Wpointer-arith -Wcast-align \
   -Wwrite-strings -Wstrict-prototypes \
   -Wcast-qual -Wconversion \
--g $(INCFLAGS) $(DEFS) #-O3 #-pg #-DDEBUG
+  -g $(INCFLAGS) $(DEFS) -O3 #-pg #-DDEBUG
 LDFLAGS += -L$(HOME)/sim/simlib/lib_osx -L/opt/local/lib -lfmt\
              -lutilSAF -lboost_system-mt -lboost_filesystem-mt -lgsl -lgslcblas\
 

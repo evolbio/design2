@@ -78,7 +78,7 @@ Allele Individual::mutUniform()
 
 Allele Individual::mutStep(Allele a)
 {
-    const Allele d = (Allele)1.0;
+    const Allele d = (Allele)1.3;
     Allele c = (rnd.rbit()) ? -d : d;
     return a + c;
 }
@@ -155,6 +155,8 @@ double Individual::calcFitness()
     for (int i = 0; i < totalLoci; ++i){
         sumAllele += genotype[i];
     }
-    return fitness = exp(-sumAllele*sumAllele/(2*fitVar));
+    // return fitness = exp(-sumAllele*sumAllele/(2*fitVar));
+    double tmp = 1 - sumAllele*sumAllele/(2*fitVar);
+    return fitness = (tmp < 0.0) ? 0.0 : tmp;
 }
 
