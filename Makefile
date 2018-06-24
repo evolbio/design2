@@ -47,6 +47,8 @@ APPHEAD   = $(NAME).h
 # get output with pprof, e.g., pprof --text --cum sensitivity.osx profile/*
 # or pprof, e.g., pprof --pdf --cum sensitivity.osx profile/* > prof.pdf
 
+# find misaligned bugs: -fsanitize=undefined -fno-omit-frame-pointer in compile
+
 CXX = g++
 CXXFLAGS += -std=c++17      # c++1z also, but can now use c++17 explicitly
 CXXFLAGS += -pedantic -Wall -Wextra -W \

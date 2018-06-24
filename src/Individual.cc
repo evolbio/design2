@@ -1,5 +1,6 @@
 #include <cmath>
 #include "Individual.h"
+#include "Performance.h"
 
 // declare static private member variables
 
@@ -112,6 +113,10 @@ void SetBabyGenotype(Individual& Parent1, Individual& Parent2, Individual& baby)
     baby.fitness = baby.calcFitness();
 }
 
+// This routine applies when -log2(rec) is integer 0,1,2,...
+// rec = 1 => -log2 rec = 0 is OK here, each successive locus chosen from alternate parent
+// assumes that random integer has random bits
+
 void SetBabyGenotypeLogRec(Individual& Parent1, Individual& Parent2, Individual& baby)
 {
     auto& g1 = Parent1.genotype;
@@ -145,18 +150,24 @@ void SetBabyGenotypeNoRec(Individual& Parent, Individual& Unused __attribute__((
     baby.fitness = baby.calcFitness();
 }
 
-// This routine applies when -log2(rec) is integer 0,1,2,...
-// rec = 1 => -log2 rec = 0 is OK here, each successive locus chosen from alternate parent
-// assumes that random integer has random bits
+// Calculation of num and den take from openVclose.h in pagmo optimization code; assumes dentilde = den, ie, not studying role of variable plant w/regard to stability margin.
 
 double Individual::calcFitness()
 {
-    double sumAllele = 0;
-    for (int i = 0; i < totalLoci; ++i){
-        sumAllele += genotype[i];
-    }
-    // return fitness = exp(-sumAllele*sumAllele/(2*fitVar));
-    double tmp = 1 - sumAllele*sumAllele/(2*fitVar);
-    return fitness = (tmp < 0.0) ? 0.0 : tmp;
+    double tmax = 20.0;
+    double gamma = 2.0;
+    double a = sqrt(1+gamma);
+    double p0 = genotype[0];
+    double p1 = 1.0;
+    double p2 = genotype[1];
+    double q0 = genotype[2];
+    double q1 = genotype[3];
+    double q2 = genotype[4];
+    std::vector<double> num {q2,q1,q0};
+    std::vector<double> den {p2, p1+a*p2, p0+ a*p1 + p2, a*p0+p1, p0};
+
+    double perf = performance(num, den, den, gamma, tmax, signalType::output);
+    // update to center at optimum performance
+    return fitness = exp(-perf*perf/(2*fitVar));
 }
 

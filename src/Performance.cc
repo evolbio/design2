@@ -47,6 +47,7 @@ double performance(const std::vector<double>& num, const std::vector<double>& de
 					const std::vector<double>& dentilde, double gamma, double tmax, signalType s)
 {
 	if (MaxRootRealPart(den) > -1e-6) return 1e20;
+    // next line checks for stability when Plant parameter a is variant, if system is unstable, then performance failure, can turn off if not checking for stability margin
 	if (MaxRootRealPart(dentilde) > 1e-6) return 1e20;
 	if (debugPerformance){
 		double sf = stepPerformance(num, den, tmax, s);
@@ -113,17 +114,12 @@ double H2sq(const std::vector<double>& num, const std::vector<double>& den)
 	
 	gsl_function F;
 	F.function = &integrandH2;
-	// if size fixed above, use new num and den, otherwise use passed in values
-	if (sizeFix){
-		struct my_params params {poly_newnum.data(), poly_newden.data()};
-		F.params = &params;
-		// std::cout << "fixed size" << std::endl;
-	}
-	else{
-		struct my_params params {num, den};
-		F.params = &params;
-	}
-	if (integrandH2(1e10, F.params) > 1e-3) return 1e20; 	// should not happen, because den.size > num.size 
+    // if size fixed above, use newnum and newden
+    const std::vector<double>& n = (sizeFix) ? poly_newnum.data() : num;
+    const std::vector<double>& d = (sizeFix) ? poly_newden.data() : den;
+    my_params params {n, d};
+    F.params = &params;
+	if (integrandH2(1e10, F.params) > 1e-3) return 1e20; 	// should not happen, because den.size > num.size
 	double result, error;
 	gsl_integration_workspace *w = gsl_integration_workspace_alloc (1000);
 	// std::cout << "h2 int start" << std::endl;
@@ -137,7 +133,7 @@ double H2sq(const std::vector<double>& num, const std::vector<double>& den)
 double integrandH2(double w, void *p)
 {
 	gsl_complex s;
-	struct my_params *params = (struct my_params *)p;
+	my_params *params = static_cast<my_params *>(p);
 	const std::vector<double>& num = params->num;
 	const std::vector<double>& den = params->den;
 	GSL_SET_COMPLEX(&s, 0, w);
@@ -152,7 +148,7 @@ double integrandH2(double w, void *p)
 int deriv(double t, const double x[], double f[], void *p)
 {
 	(void)(t); /* avoid unused parameter warning */
-	struct my_params *params = (struct my_params *)p;
+	my_params *params = static_cast<my_params *>(p);
 	const std::vector<double>& den = params->den;
 	auto lastrow = den.size()-2;
 	f[lastrow] = 0;
@@ -176,7 +172,7 @@ double stepPerformance(const std::vector<double>& num, const std::vector<double>
 {
 	double time[steps+1];
 	double y[steps+1];
-	struct my_params params = {num, den};
+	my_params params = {num, den};
 	auto dim = den.size()-1;	// dimensions of state space model for dynamics
 	gsl_odeiv2_system sys = {deriv, NULL, dim, &params};
 	gsl_odeiv2_driver *d =
@@ -256,7 +252,7 @@ double stepPerformance(const std::vector<double>& num, const std::vector<double>
     
     // std::cout << gsl_spline_eval(spline, 19.9689, acc) << std::endl;
     
-	struct stepParam integrParam = {spline, acc};
+	stepParam integrParam = {spline, acc};
     gsl_function F;
 	F.function = &integrandStep;
 	F.params = &integrParam;
@@ -290,7 +286,7 @@ double stepPerformance(const std::vector<double>& num, const std::vector<double>
 
 double integrandStep(double t, void *p)
 {
-	struct stepParam *params = (struct stepParam *)p;
+	stepParam *params = static_cast<stepParam *>(p);
 	double z = 1.0 - gsl_spline_eval(params->spline, t, params->acc);
 	return z*z;
 }

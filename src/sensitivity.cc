@@ -66,7 +66,7 @@ void LifeCycle(Param& param, std::ostringstream& resultss)
 
     op->setFitnessArray();
     for (i = 0; i < gen; ++i){
-        if (showProgress && ((i % 1000) == 0))
+        if (showProgress && ((i % 100) == 0))
             std::cout << fmt::format("Rep {:8} of {:8}\n", i, param.gen);
         np->reproduceMutateCalcFit(*op);
         swap = op;
