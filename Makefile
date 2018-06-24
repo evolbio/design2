@@ -23,7 +23,7 @@ endif
 PROG    = $(NAME)$(PSUFFIX)
 DEPEND  = src/dependencies$(SUFFIX)
 
-CXXFILES   =  $(NAME).cc Individual.cc Population.cc SumStat.cc
+CXXFILES   =  $(NAME).cc Individual.cc Population.cc SumStat.cc Performance.cc
 OBJFILES   = $(CXXFILES:.cc=.o)
 
 # defs for linking to sim_client.cc instead of main-alone.cc

@@ -10,6 +10,8 @@
 		AA175BB420D9272C008DB808 /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = util.h; path = ../../simlib/include/util.h; sourceTree = "<group>"; };
 		AA2B46C620D22A27002DDDFA /* 00_readme.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = 00_readme.txt; sourceTree = "<group>"; };
 		AA2B46C720D22A52002DDDFA /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		AA68C0CF20DF4CA000F3FDA1 /* Performance.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Performance.cc; path = src/Performance.cc; sourceTree = "<group>"; };
+		AA68C0D020DF4CA000F3FDA1 /* Performance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Performance.h; path = src/Performance.h; sourceTree = "<group>"; };
 		AA8E1E0820D3955500935CDC /* sensitivity.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sensitivity.cc; path = src/sensitivity.cc; sourceTree = "<group>"; };
 		AA8E1E0920D3955500935CDC /* main-alone.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "main-alone.cc"; path = "src/main-alone.cc"; sourceTree = "<group>"; };
 		AA8E1E0A20D3955500935CDC /* typedefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = typedefs.h; path = src/typedefs.h; sourceTree = "<group>"; };
@@ -51,6 +53,8 @@
 		AA8E1E0620D3944800935CDC /* src */ = {
 			isa = PBXGroup;
 			children = (
+				AA68C0CF20DF4CA000F3FDA1 /* Performance.cc */,
+				AA68C0D020DF4CA000F3FDA1 /* Performance.h */,
 				AAE8229E20D4D72C00ADA04C /* Population.cc */,
 				AAE8229F20D4D72C00ADA04C /* Population.h */,
 				AAE822A020D4D72C00ADA04C /* SumStat.cc */,
