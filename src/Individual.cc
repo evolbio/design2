@@ -55,16 +55,27 @@ void Individual::initialize()
     genotype = std::unique_ptr<Allele[]> {new Allele[totalLoci]};
     float p = static_cast<float>(1.0/sqrt(gamma));
     // p0 = 0 by assumption
-    genotype[0] = 1.0;              // p1
-    switch(loop){                   // p2
-        case Loop::open:    genotype[1] = p; break;
-        case Loop::close:   genotype[1] = 0.0; break;
-        case Loop::dclose:  genotype[1] = 0.0; break;   // this needs to be updated
-    }
     genotype[2] = p;                // q0
     genotype[3] = static_cast<float>(sqrt(1+gamma)*p);  // q1
-    // q2 depends on open vs close loop
     genotype[4] = p;                // q2
+    switch(loop){                   // p2
+        case Loop::open:
+            genotype[0] = 1.0;      // p1
+            genotype[1] = p;        // p2
+            break;
+        case Loop::close:
+            genotype[0] = 1.0;      // p1
+            genotype[1] = 0.0;      // p2
+            break;
+        case Loop::dclose:
+            Allele r = 10.0f;       // by assumption, see plasticity II
+            Allele k = 1/r;         // by assumption, see plasticity II
+            genotype[0] = k;        // p1
+            genotype[1] = k*r-p;    // p2
+            genotype[5] = r;        // r
+            genotype[6] = k;        // k
+            break;
+    }
 
     for (int i = 0; i < totalLoci; ++i){
         genotype[i] = mutateStep(genotype[i]);
@@ -160,6 +171,7 @@ void SetBabyGenotypeNoRec(Individual& Parent, Individual& Unused __attribute__((
 }
 
 // Calculation of num and den take from openVclose.h in pagmo optimization code; assumes dentilde = den, ie, not studying role of variable plant w/regard to stability margin. Plant set, see manuscripts. Plant parameters do not vary, thus a is set to optimal value of a = sqrt(1 + gamma), and optimal value of J = sqrt(gamma).
+// Forms for num and den in MMA file
 
 double Individual::calcJ()
 {
@@ -171,12 +183,25 @@ double Individual::calcJ()
     double q0 = genotype[2];
     double q1 = genotype[3];
     double q2 = genotype[4];
-    std::vector<double> num {q2,q1,q0};
+    double r  = genotype[5];
+    double k  = genotype[6];
+    std::vector<double> num;
     std::vector<double> den;
     switch (loop){
-        case Loop::open:    den = {p2, p1+a*p2, a*p1 + p2, p1}; break;
-        case Loop::close:   den = {p2+q2, p1+a*p2+q1, a*p1+p2+q0, p1}; break;
-        case Loop::dclose:  den = {0}; break;
+        case Loop::open:
+            num = {q2,q1,q0};
+            den = {p2, p1+a*p2, a*p1 + p2, p1};
+            break;
+        case Loop::close:
+            num = {q2,q1,q0};
+            den = {p2+q2, p1+a*p2+q1, a*p1+p2+q0, p1};
+            break;
+        case Loop::dclose:
+            double rk = r*k;
+            num = {rk*q2, rk*q1 + k*q2, rk*q0 + k*q1, k*q0};
+            den = {rk*q2, p2 + rk*q1 + q2 + k*q2, p1 + a*p2 + rk*q0 + q1 + k*q1,
+                a*p1 + p2 + q0 + k*q0, p1};
+            break;
     }
     
     return performance(num, den, gamma, tmax, signalType::output);
