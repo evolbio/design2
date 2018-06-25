@@ -44,11 +44,9 @@ struct stepParam {gsl_spline *spline; gsl_interp_accel *acc;};
 // Do chopping to set param to zero if close and check bounds before call
 
 double performance(const std::vector<double>& num, const std::vector<double>& den,
-					const std::vector<double>& dentilde, double gamma, double tmax, signalType s)
+					double gamma, double tmax, signalType s)
 {
 	if (MaxRootRealPart(den) > -1e-6) return 1e20;
-    // next line checks for stability when Plant parameter a is variant, if system is unstable, then performance failure, can turn off if not checking for stability margin
-	if (MaxRootRealPart(dentilde) > 1e-6) return 1e20;
 	if (debugPerformance){
 		double sf = stepPerformance(num, den, tmax, s);
 		double hf = H2sq(num,den);

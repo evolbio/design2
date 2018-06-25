@@ -11,7 +11,6 @@ void debugPerformanceOn(unsigned);
 enum class signalType {output, controlOpen, controlClosed};
 
 double performance(const std::vector<double>& num, const std::vector<double>& den, 
-					const std::vector<double>& dentilde,
 					double gamma, double tmax, signalType s);
 
 

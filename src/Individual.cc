@@ -52,7 +52,15 @@ Individual& Individual::operator=(const Individual& other)
 void Individual::initialize()
 {
     genotype = std::unique_ptr<Allele[]> {new Allele[totalLoci]};
-    
+    float p = static_cast<float>(1.0/sqrt(gamma));
+    // p0 = 0 by assumption
+    genotype[0] = 1.0;              // p1
+    genotype[1] = p;                // p2
+    genotype[2] = p;                // q0
+    genotype[3] = static_cast<float>(sqrt(1+gamma)*p);  // q1
+    // q2 depends on open vs close loop
+    genotype[4] = p;                // q2
+
     for (int i = 0; i < totalLoci; ++i){
         genotype[i] = mutUniform();
     }
@@ -158,16 +166,16 @@ double Individual::calcJ()
 {
     double tmax = 20.0;
     double a = sqrt(1+gamma);
-    double p0 = genotype[0];
-    double p1 = 1.0;
+    // p0 = 0 by assumption
+    double p1 = genotype[0];
     double p2 = genotype[1];
     double q0 = genotype[2];
     double q1 = genotype[3];
     double q2 = genotype[4];
     std::vector<double> num {q2,q1,q0};
-    std::vector<double> den {p2, p1+a*p2, p0+ a*p1 + p2, a*p0+p1, p0};
+    std::vector<double> den {p2, p1+a*p2, a*p1 + p2, p1};
     
-    return performance(num, den, den, gamma, tmax, signalType::output);
+    return performance(num, den, gamma, tmax, signalType::output);
 }
 
 double Individual::calcFitness()

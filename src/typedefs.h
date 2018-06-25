@@ -10,7 +10,7 @@ using ulong  = unsigned long;
 using Allele    = float;
 using AllelePtr = Allele*;
 
-struct Param{
+struct Param {
     int   runNum;
     int   distnSteps;
     int   gen;
@@ -24,7 +24,6 @@ struct Param{
     std::string rec;
 };
 
-using Param = struct Param;
 
 
 #endif
