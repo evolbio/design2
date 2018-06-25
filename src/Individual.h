@@ -55,6 +55,7 @@ private:
     static ulong    negLog2Rec;     // -log2 recombination, used when rec = 1, 1/2, 1/4, ...
     static Allele   maxAllele;      // max allelic value
     static double   fitVar;         // variance of fitness scaling
+    static double   gamma;          // weighting of performance components
     std::unique_ptr<Allele[]> genotype;
     double          fitness;
 };

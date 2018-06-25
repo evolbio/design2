@@ -9,6 +9,7 @@ double Individual::rec;
 int Individual::totalLoci;
 Allele Individual::maxAllele;
 double Individual::fitVar;
+double Individual::gamma;
 ulong Individual::negLog2Rec;
 
 // Algorithm for fast Poisson for lambda < 30
@@ -67,6 +68,7 @@ void Individual::setParam(Param& param)
     totalLoci = param.loci;
     maxAllele = param.maxAllele;
     fitVar = param.fitVar;
+    gamma = param.gamma;
     negLog2Rec = 1;         // set elsewhere when needed, here is just default value
 }
 
@@ -155,7 +157,6 @@ void SetBabyGenotypeNoRec(Individual& Parent, Individual& Unused __attribute__((
 double Individual::calcJ()
 {
     double tmax = 20.0;
-    double gamma = 2.0;
     double a = sqrt(1+gamma);
     double p0 = genotype[0];
     double p1 = 1.0;
@@ -171,7 +172,6 @@ double Individual::calcJ()
 
 double Individual::calcFitness()
 {
-    double gamma = 2.0;
     double optJ = sqrt(gamma);
     double Jdev = (calcJ()/optJ) - 1.0;
     return fitness = exp(-(Jdev*Jdev)/(2*fitVar));

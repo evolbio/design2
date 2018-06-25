@@ -83,7 +83,7 @@ void GetParam(Param& p, std::istringstream& parmBuf)
 {
     double tmpGen, tmpLoci, tmpPop;
     
-    parmBuf >> p.runNum >> tmpGen >> tmpLoci >> tmpPop >> p.mutation >> p.recombination >> p.maxAllele >> p.fitVar;
+    parmBuf >> p.runNum >> tmpGen >> tmpLoci >> tmpPop >> p.mutation >> p.recombination >> p.maxAllele >> p.fitVar >> p.gamma;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
 
@@ -105,16 +105,17 @@ std::string PrintParam(Param& p)
     std::string outString;
     std::string format = "{:<10} = {:>9}\n";
     std::string formatf = "{:<10} = {:>9.3e}\n";
-    outString += fmt::format(format, "Run", p.runNum);
-    outString += fmt::format(format, "disStp", p.distnSteps);
-    outString += fmt::format(format, "gen", p.gen);
-    outString += fmt::format(format, "loci", p.loci);
-    outString += fmt::format(format, "popSz", p.popsize);
+    outString += fmt::format(format,  "Run", p.runNum);
+    outString += fmt::format(format,  "disStp", p.distnSteps);
+    outString += fmt::format(format,  "gen", p.gen);
+    outString += fmt::format(format,  "loci", p.loci);
+    outString += fmt::format(format,  "popSz", p.popsize);
     outString += fmt::format(formatf, "mut", p.mutation);
     outString += fmt::format(formatf, "rec", p.recombination);
-    outString += fmt::format(format, "recT", p.rec);
+    outString += fmt::format(format,  "recT", p.rec);
     outString += fmt::format(formatf, "maxAllele", p.maxAllele);
     outString += fmt::format(formatf, "fitVar", p.fitVar);
+    outString += fmt::format(formatf, "gamma", p.gamma);
     outString += "\n";
     return outString;
 }
@@ -136,7 +137,21 @@ void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
         resultss << fmt::format("{:11.3e}\n", fitness[j]);
     }
     resultss << "\n";
-
+    
+    // print performance distn
+    
+    resultss << fmt::format("{}", "Performance distribution\n\n");
+    resultss << fmt::format("{:5}{:11.3e}\n", " Mean", stats.getAvePerf());
+    resultss << fmt::format("{:5}{:11.3e}\n", "   SD", stats.getSDPerf());
+    
+    const auto& perf = stats.getPerfDistn();
+    
+    for (int j = 0; j < param.distnSteps; ++j){
+        resultss << fmt::format("{:5.1f}", 100.0*(double)j/(double)(param.distnSteps-1));
+        resultss << fmt::format("{:11.3e}\n", perf[j]);
+    }
+    resultss << "\n";
+    
     // print genotype distn statistics for each locus
     
     const auto& gMean = stats.getGMean();

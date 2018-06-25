@@ -1,15 +1,15 @@
 COMMENTS:
 
-    disStp      steps in distributions
-    loci        number of loci
-    popsize     hermaphrodites, haploid
-    mut         mutation rate per allele
-    rec         recombination probability between loci
-    s           intensity of selection
-    maxAllele   max allelic value
-    fitVar      1/steepness of fitness gradient
+disStp      steps in distributions
+loci        number of loci
+popsize     hermaphrodites, haploid
+mut         mutation rate per allele
+rec         recombination probability between loci
+maxAllele   max allelic value
+fitVar      1/steepness of fitness gradient
+gamma       weighting of step vs perturb performance
 
-REPLICATES  = 1
+REPLICATES  = 3
 CONTROL PARAMETERS:
 disStp      = 101   // number of percentile steps to collect, 101=>[0..100]
 seed        = 7777  // random seed if newseed is zero
@@ -18,12 +18,13 @@ END
 DESIGN PARAMETERS:
 Param    Levels     Center     Increm  Scale
 
-gen        3        8e3          2.0     E
-loci       3        6e0          1.0     L
-popsize    3        1e4          2.0     E
-mut        1        1e-4        10.0     E
-rec        1        5e-1        10.0     E
-maxAllele  1        1e2          2.0     E
+gen        1        4e2          2.0     E
+loci       1        5e0          1.0     L
+popsize    1        5e2          2.0     E
+mut        3        1e-2         4.0     E
+rec        1        2.5e-1       2.0     E
+maxAllele  1        1e1          2.0     E
 fitVar     1        1e-2         2.0     E
+gamma      1        2e0          2.0     E
 
 END

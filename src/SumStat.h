@@ -19,6 +19,11 @@ public:
     double      getSDFitness(){return sdFitness;}
     void        setAveFitness(double x){aveFitness = x;}
     void        setSDFitness(double x){sdFitness = x;}
+    auto&       getPerfDistn(){return perfDistn;}
+    double      getAvePerf(){return avePerf;}
+    double      getSDPerf(){return sdPerf;}
+    void        setAvePerf(double x){avePerf = x;}
+    void        setSDPerf(double x){sdPerf = x;}
 private:
     std::vector<double> gMean;	// mean values of component failure rates
     std::vector<double> gSD;	// sd values of component failure rates
@@ -28,7 +33,10 @@ private:
     int         distnSteps;     // steps in percentile distns
     double      aveFitness;
     double      sdFitness;
+    double      avePerf;
+    double      sdPerf;
     std::vector<double> fitnessDistn;
+    std::vector<double> perfDistn;
 };
 
 #endif

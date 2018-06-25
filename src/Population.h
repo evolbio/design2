@@ -23,7 +23,7 @@ public:
     void        createAliasTable();
 private:
     int     	chooseMember(double *array, int n);
-	int 		popSize;		// # females = # males = popSize
+	int 		popSize;
     std::vector<Individual>	ind;			// vector of individuals
     std::vector<double>		indFitness;     // fitness of individuals
     std::vector<uint64_t>   hvec;

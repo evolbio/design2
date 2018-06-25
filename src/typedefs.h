@@ -16,10 +16,11 @@ struct Param{
     int   gen;
     int   loci;
     int   popsize;
-    float mutation;
-    float recombination;
+    double mutation;
+    double recombination;
     Allele maxAllele; // max allelic value
     double fitVar;   // width of fitness gradient
+    double gamma;
     std::string rec;
 };
 

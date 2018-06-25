@@ -119,6 +119,19 @@ void Population::calcStats(Param& param, SumStat& stats)
     
     auto& fitnessDistn = stats.getFitnessDistn();
     fitnessDistn = percentiles_interpol<std::vector<double>>(indFitness, ptiles);
+    
+    // perf distn
+    
+    std::vector<double> indPerf(popSize);
+    for (i = 0; i < popSize; ++i){
+        indPerf[i] = ind[i].calcJ();
+    }
+    double pmean = vecMean<double>(indPerf);
+    stats.setAvePerf(pmean);
+    stats.setSDPerf(vecSD<double>(indPerf, pmean));
+    
+    auto& perfDistn = stats.getPerfDistn();
+    perfDistn = percentiles_interpol<std::vector<double>>(indPerf, ptiles);
 }
 
 // Alias method for sampling from discrete distribution, see https://pandasthumb.org/archives/2012/08/lab-notes-the-a.html and https://en.wikipedia.org/wiki/Alias_method and http://www.keithschwarz.com/darts-dice-coins/
