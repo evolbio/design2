@@ -150,9 +150,9 @@ void SetBabyGenotypeNoRec(Individual& Parent, Individual& Unused __attribute__((
     baby.fitness = baby.calcFitness();
 }
 
-// Calculation of num and den take from openVclose.h in pagmo optimization code; assumes dentilde = den, ie, not studying role of variable plant w/regard to stability margin.
+// Calculation of num and den take from openVclose.h in pagmo optimization code; assumes dentilde = den, ie, not studying role of variable plant w/regard to stability margin. Plant set, see manuscripts. Plant parameters do not vary, thus a is set to optimal value of a = sqrt(1 + gamma), and optimal value of J = sqrt(gamma).
 
-double Individual::calcFitness()
+double Individual::calcJ()
 {
     double tmax = 20.0;
     double gamma = 2.0;
@@ -165,9 +165,15 @@ double Individual::calcFitness()
     double q2 = genotype[4];
     std::vector<double> num {q2,q1,q0};
     std::vector<double> den {p2, p1+a*p2, p0+ a*p1 + p2, a*p0+p1, p0};
+    
+    return performance(num, den, den, gamma, tmax, signalType::output);
+}
 
-    double perf = performance(num, den, den, gamma, tmax, signalType::output);
-    // update to center at optimum performance
-    return fitness = exp(-perf*perf/(2*fitVar));
+double Individual::calcFitness()
+{
+    double gamma = 2.0;
+    double optJ = sqrt(gamma);
+    double Jdev = (calcJ()/optJ) - 1.0;
+    return fitness = exp(-(Jdev*Jdev)/(2*fitVar));
 }
 

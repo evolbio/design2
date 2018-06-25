@@ -42,6 +42,7 @@ public:
     void			mutate();
     auto            getRecombination(){return rec;}
     void            setRecombination(double r){rec = r;}
+    double          calcJ();
     double			calcFitness();
     double          getFitness(){return fitness;};
     auto&   	    getGenotype(){return genotype;};
