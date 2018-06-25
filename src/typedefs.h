@@ -20,8 +20,8 @@ struct Param {
     int   popsize;
     double mutation;
     double recombination;
-    Allele maxAllele; // max allelic value
-    double fitVar;   // width of fitness gradient
+    Allele mutStep;     // max allelic value
+    double fitVar;      // width of fitness gradient
     double gamma;
     Loop loop;
     std::string rec;

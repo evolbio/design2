@@ -46,14 +46,13 @@ public:
     double			calcFitness();
     double          getFitness(){return fitness;};
     auto&   	    getGenotype(){return genotype;};
-    Allele          mutUniform();
-    Allele          mutStep(Allele a);
+    Allele          mutateStep(Allele a);
 private:
     static double	mut;            // per genome mutation rate, param.mutation is per locus mutation rate
     static int		totalLoci;
     static double   rec;            // recombination probability
     static ulong    negLog2Rec;     // -log2 recombination, used when rec = 1, 1/2, 1/4, ...
-    static Allele   maxAllele;      // max allelic value
+    static Allele   mutStep;        // size of mutational step
     static double   fitVar;         // variance of fitness scaling
     static double   gamma;          // weighting of performance components
     static Loop     loop;           // control loop type

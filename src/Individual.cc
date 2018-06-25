@@ -7,7 +7,7 @@
 double Individual::mut;
 double Individual::rec;
 int Individual::totalLoci;
-Allele Individual::maxAllele;
+Allele Individual::mutStep;
 double Individual::fitVar;
 double Individual::gamma;
 Loop Individual::loop;
@@ -56,14 +56,18 @@ void Individual::initialize()
     float p = static_cast<float>(1.0/sqrt(gamma));
     // p0 = 0 by assumption
     genotype[0] = 1.0;              // p1
-    genotype[1] = p;                // p2
+    switch(loop){                   // p2
+        case Loop::open:    genotype[1] = p; break;
+        case Loop::close:   genotype[1] = 0.0; break;
+        case Loop::dclose:  genotype[1] = 0.0; break;   // this needs to be updated
+    }
     genotype[2] = p;                // q0
     genotype[3] = static_cast<float>(sqrt(1+gamma)*p);  // q1
     // q2 depends on open vs close loop
     genotype[4] = p;                // q2
 
     for (int i = 0; i < totalLoci; ++i){
-        genotype[i] = mutUniform();
+        genotype[i] = mutateStep(genotype[i]);
     }
     fitness = calcFitness();
 }
@@ -75,24 +79,18 @@ void Individual::setParam(Param& param)
     mut = param.mutation;
     rec = param.recombination;
     totalLoci = param.loci;
-    maxAllele = param.maxAllele;
+    mutStep = param.mutStep;
     fitVar = param.fitVar;
     gamma = param.gamma;
     loop = param.loop;
     negLog2Rec = 1;         // set elsewhere when needed, here is just default value
 }
 
-Allele Individual::mutUniform()
-{
-    return static_cast<Allele>(rnd.rUniform(-maxAllele,maxAllele));
-}
-
 // could use bit cache for random bits to speed up
 
-Allele Individual::mutStep(Allele a)
+Allele Individual::mutateStep(Allele a)
 {
-    const Allele d = (Allele)1.3;
-    Allele c = (rnd.rbit()) ? -d : d;
+    auto c = static_cast<Allele>(rnd.rUniform(-mutStep,mutStep));
     return a + c;
 }
 
@@ -104,8 +102,7 @@ void Individual::mutate()
     int hits = MyRandomPoisson(mut*totalLoci);
     for (int i = 0; i < hits; ++i){
         ulong locus = rnd.rtop(totalLoci);
-        genotype[locus] = mutStep(genotype[locus]);
-        //genotype[locus] = mutUniform();
+        genotype[locus] = mutateStep(genotype[locus]);
     }
 }
 
