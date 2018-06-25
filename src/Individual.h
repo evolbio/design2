@@ -56,6 +56,7 @@ private:
     static Allele   maxAllele;      // max allelic value
     static double   fitVar;         // variance of fitness scaling
     static double   gamma;          // weighting of performance components
+    static Loop     loop;           // control loop type
     std::unique_ptr<Allele[]> genotype;
     double          fitness;
 };

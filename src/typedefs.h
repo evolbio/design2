@@ -10,6 +10,8 @@ using ulong  = unsigned long;
 using Allele    = float;
 using AllelePtr = Allele*;
 
+enum class Loop {open, close, dclose};
+
 struct Param {
     int   runNum;
     int   distnSteps;
@@ -21,9 +23,8 @@ struct Param {
     Allele maxAllele; // max allelic value
     double fitVar;   // width of fitness gradient
     double gamma;
+    Loop loop;
     std::string rec;
 };
-
-
 
 #endif

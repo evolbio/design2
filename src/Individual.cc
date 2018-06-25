@@ -10,6 +10,7 @@ int Individual::totalLoci;
 Allele Individual::maxAllele;
 double Individual::fitVar;
 double Individual::gamma;
+Loop Individual::loop;
 ulong Individual::negLog2Rec;
 
 // Algorithm for fast Poisson for lambda < 30
@@ -77,6 +78,7 @@ void Individual::setParam(Param& param)
     maxAllele = param.maxAllele;
     fitVar = param.fitVar;
     gamma = param.gamma;
+    loop = param.loop;
     negLog2Rec = 1;         // set elsewhere when needed, here is just default value
 }
 
@@ -173,7 +175,12 @@ double Individual::calcJ()
     double q1 = genotype[3];
     double q2 = genotype[4];
     std::vector<double> num {q2,q1,q0};
-    std::vector<double> den {p2, p1+a*p2, a*p1 + p2, p1};
+    std::vector<double> den;
+    switch (loop){
+        case Loop::open:    den = {p2, p1+a*p2, a*p1 + p2, p1}; break;
+        case Loop::close:   den = {p2+q2, p1+a*p2+q1, a*p1+p2+q0, p1}; break;
+        case Loop::dclose:  den = {0}; break;
+    }
     
     return performance(num, den, gamma, tmax, signalType::output);
 }

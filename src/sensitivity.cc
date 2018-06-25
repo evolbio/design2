@@ -81,19 +81,21 @@ void LifeCycle(Param& param, std::ostringstream& resultss)
 
 void GetParam(Param& p, std::istringstream& parmBuf)
 {
-    double tmpGen, tmpLoci, tmpPop;
+    double tmpGen, tmpPop;
     
-    parmBuf >> p.runNum >> tmpGen >> tmpLoci >> tmpPop >> p.mutation >> p.recombination >> p.maxAllele >> p.fitVar >> p.gamma;
+    parmBuf >> p.runNum >> tmpGen >> tmpPop >> p.mutation >> p.recombination >> p.maxAllele >> p.fitVar >> p.gamma;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
 
     p.gen = round<int>(tmpGen);
-    p.loci = round<int>(tmpLoci);
     p.popsize = round<int>(tmpPop);
     
     rndType newseed;
     rndType parmSeed;
-    parmBuf >> p.distnSteps >> parmSeed >> newseed;
+    int loop;
+    parmBuf >> p.distnSteps >> loop >> parmSeed >> newseed;
+    p.loop = static_cast<Loop>(loop);
+    p.loci = (p.loop == Loop::dclose) ? 7 : 5;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
 	if (!newseed)
@@ -107,6 +109,7 @@ std::string PrintParam(Param& p)
     std::string formatf = "{:<10} = {:>9.3e}\n";
     outString += fmt::format(format,  "Run", p.runNum);
     outString += fmt::format(format,  "disStp", p.distnSteps);
+    outString += fmt::format(format,  "loop", static_cast<int>(p.loop));
     outString += fmt::format(format,  "gen", p.gen);
     outString += fmt::format(format,  "loci", p.loci);
     outString += fmt::format(format,  "popSz", p.popsize);
