@@ -12,6 +12,7 @@ double Individual::aSD;
 double Individual::fitVar;
 double Individual::gamma;
 Loop Individual::loop;
+int Individual::mutLocus;
 ulong Individual::negLog2Rec;
 
 // Algorithm for fast Poisson for lambda < 30
@@ -78,9 +79,12 @@ void Individual::initialize()
             break;
     }
 
-    for (int i = 0; i < totalLoci; ++i){
-        genotype[i] = mutateStep(genotype[i]);
-    }
+    if (mutLocus >= 0)
+        genotype[mutLocus] = mutateStep(genotype[mutLocus]);
+    else
+        for (int i = 0; i < totalLoci; ++i){
+            genotype[i] = mutateStep(genotype[i]);
+        }
     fitness = calcFitness();
 }
 
@@ -96,6 +100,7 @@ void Individual::setParam(Param& param)
     fitVar = param.fitVar;
     gamma = param.gamma;
     loop = param.loop;
+    mutLocus = param.mutLocus;
     negLog2Rec = 1;         // set elsewhere when needed, here is just default value
 }
 
@@ -111,11 +116,15 @@ Allele Individual::mutateStep(Allele a)
 
 void Individual::mutate()
 {
-    // ulong hits = rnd.poisson(mut*totalLoci);  // about twice as slow, note change in type for hits
-    int hits = MyRandomPoisson(mut*totalLoci);
-    for (int i = 0; i < hits; ++i){
-        ulong locus = rnd.rtop(totalLoci);
-        genotype[locus] = mutateStep(genotype[locus]);
+    if (mutLocus >= 0)
+        if (rnd.rU01() < mut)
+            genotype[mutLocus] = mutateStep(genotype[mutLocus]);
+    else{
+        int hits = MyRandomPoisson(mut*totalLoci);  // about twice as fast as rnd.poisson()
+        for (int i = 0; i < hits; ++i){
+            ulong locus = rnd.rtop(totalLoci);
+            genotype[locus] = mutateStep(genotype[locus]);
+        }
     }
 }
 

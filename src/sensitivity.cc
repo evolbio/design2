@@ -81,24 +81,28 @@ void LifeCycle(Param& param, std::ostringstream& resultss)
 
 void GetParam(Param& p, std::istringstream& parmBuf)
 {
-    double tmpGen, tmpPop;
+    double tmpGen, tmpPop, tmpMutLoc;
     
     parmBuf >> p.runNum >> tmpGen >> tmpPop >> p.mutation >> p.recombination >> p.mutStep >>
-        p.aSD >>p.fitVar >> p.gamma;
+        p.aSD >>p.fitVar >> p.gamma >> tmpMutLoc;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
 
     p.gen = round<int>(tmpGen);
     p.popsize = round<int>(tmpPop);
+    p.mutLocus = round<int>(tmpMutLoc);
     
     rndType newseed;
     rndType parmSeed;
     int loop;
     parmBuf >> p.distnSteps >> loop >> parmSeed >> newseed;
-    p.loop = static_cast<Loop>(loop);
-    p.loci = (p.loop == Loop::dclose) ? 7 : 5;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
+    
+    p.loop = static_cast<Loop>(loop);
+    p.loci = (p.loop == Loop::dclose) ? 7 : 5;
+    if (p.mutLocus >= p.loci)
+        ThrowError(__FILE__, __LINE__, "Mutated locus number greater than number loci.");
 	if (!newseed)
 		rnd.setRandSeed(parmSeed);	// initial random numbers
 }
@@ -121,6 +125,7 @@ std::string PrintParam(Param& p)
     outString += fmt::format(formatf, "aSD", p.aSD);
     outString += fmt::format(formatf, "fitVar", p.fitVar);
     outString += fmt::format(formatf, "gamma", p.gamma);
+    outString += fmt::format(format,  "mutLocus", p.mutLocus);
     outString += "\n";
     return outString;
 }

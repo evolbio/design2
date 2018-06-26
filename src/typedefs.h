@@ -18,6 +18,7 @@ struct Param {
     int   gen;
     int   loci;
     int   popsize;
+    int   mutLocus;
     double mutation;
     double recombination;
     Allele mutStep;     // max allelic value

@@ -57,6 +57,7 @@ private:
     static double   fitVar;         // variance of fitness scaling
     static double   gamma;          // weighting of performance components
     static Loop     loop;           // control loop type
+    static int      mutLocus;       // if >= 0, then mutate only this locus
     std::unique_ptr<Allele[]> genotype;
     double          fitness;
 };
