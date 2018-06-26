@@ -7,24 +7,26 @@ popsize     hermaphrodites, haploid
 mut         mutation rate per allele
 rec         recombination probability between loci
 mutStep     mutation = current val +/- rnd.rUniform(-mutStep,mutStep)
+aSD         sd for plant parameter a, in which a = A*2^x, x dist N(0,aSD)
 fitVar      1/steepness of fitness gradient
 gamma       weighting of step vs perturb performance
 
 REPLICATES  = 3
 CONTROL PARAMETERS:
 disStp      = 101   // number of percentile steps to collect, 101=>[0..100]
-loop        = 1;    // 0 => open; 1 => close; 2 => double close
+loop        = 0;    // 0 => open; 1 => close; 2 => double close
 seed        = 7777  // random seed if newseed is zero
 newseed     = 1     // !0 => get seed from file rather than here
 END
 DESIGN PARAMETERS:
 Param    Levels     Center     Increm  Scale
 
-gen        1        4e2          2.0     E
+gen        1        4e1          2.0     E
 popsize    1        5e2          2.0     E
 mut        3        1e-2         4.0     E
 rec        1        2.5e-1       2.0     E
 mutStep    1        1e-1         2.0     E
+aSD        1        5e-1         2.0     E
 fitVar     1        1e-2         2.0     E
 gamma      1        2e0          2.0     E
 

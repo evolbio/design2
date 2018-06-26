@@ -8,6 +8,7 @@ double Individual::mut;
 double Individual::rec;
 int Individual::totalLoci;
 Allele Individual::mutStep;
+double Individual::aSD;
 double Individual::fitVar;
 double Individual::gamma;
 Loop Individual::loop;
@@ -91,6 +92,7 @@ void Individual::setParam(Param& param)
     rec = param.recombination;
     totalLoci = param.loci;
     mutStep = param.mutStep;
+    aSD = param.aSD;
     fitVar = param.fitVar;
     gamma = param.gamma;
     loop = param.loop;
@@ -177,6 +179,7 @@ double Individual::calcJ()
 {
     double tmax = 20.0;
     double a = sqrt(1+gamma);
+    if (abs(aSD) > 1e-6) a *= pow(2.0,rnd.normal(0,aSD));   // a = a*2^x, x ~ N(0,aSD)
     // p0 = 0 by assumption
     double p1 = genotype[0];
     double p2 = genotype[1];

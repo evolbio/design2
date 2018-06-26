@@ -21,6 +21,7 @@ struct Param {
     double mutation;
     double recombination;
     Allele mutStep;     // max allelic value
+    double aSD;
     double fitVar;      // width of fitness gradient
     double gamma;
     Loop loop;

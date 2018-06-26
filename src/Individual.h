@@ -53,6 +53,7 @@ private:
     static double   rec;            // recombination probability
     static ulong    negLog2Rec;     // -log2 recombination, used when rec = 1, 1/2, 1/4, ...
     static Allele   mutStep;        // size of mutational step
+    static double   aSD;            // variability of plant parameter a
     static double   fitVar;         // variance of fitness scaling
     static double   gamma;          // weighting of performance components
     static Loop     loop;           // control loop type

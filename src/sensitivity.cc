@@ -83,7 +83,8 @@ void GetParam(Param& p, std::istringstream& parmBuf)
 {
     double tmpGen, tmpPop;
     
-    parmBuf >> p.runNum >> tmpGen >> tmpPop >> p.mutation >> p.recombination >> p.mutStep >> p.fitVar >> p.gamma;
+    parmBuf >> p.runNum >> tmpGen >> tmpPop >> p.mutation >> p.recombination >> p.mutStep >>
+        p.aSD >>p.fitVar >> p.gamma;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
 
@@ -117,6 +118,7 @@ std::string PrintParam(Param& p)
     outString += fmt::format(formatf, "rec", p.recombination);
     outString += fmt::format(format,  "recT", p.rec);
     outString += fmt::format(formatf, "mutStep", p.mutStep);
+    outString += fmt::format(formatf, "aSD", p.aSD);
     outString += fmt::format(formatf, "fitVar", p.fitVar);
     outString += fmt::format(formatf, "gamma", p.gamma);
     outString += "\n";
