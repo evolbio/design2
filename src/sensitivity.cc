@@ -238,7 +238,7 @@ void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
         const auto& sd = stats.getSSD();
         const auto& distn = stats.getSDistn();
         
-        resultss << "Distribution of genotype values, rows are percentiles\n\n";
+        resultss << "Distribution of stochastic values, rows are percentiles\n\n";
         PrintGDistn(param, resultss, mean, sd, distn);
         
         // print S corr matrix

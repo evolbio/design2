@@ -94,7 +94,10 @@ void Individual::initialize()
     else{
         for (int i = 0; i < totalLoci; ++i){
             genotype[i] = mutateStep(genotype[i]);
-            if (stoch) stochast[i] = mutateStep(stochast[i]);
+            if (stoch){
+                stochast[i] = mutateStep(stochast[i]);
+                if (stochast[i] < 0) stochast[i] = static_cast<Allele>(0);
+            }
         }
     }
     fitness = calcFitness();
@@ -130,11 +133,11 @@ Allele Individual::mutateStep(Allele a)
 
 void Individual::mutate()
 {
-    mutateG(genotype);
-    if (stoch) mutateG(stochast);
+    mutateG(genotype, false);
+    if (stoch) mutateG(stochast, true);
 }
 
-void Individual::mutateG(std::unique_ptr<Allele []>& g)
+void Individual::mutateG(std::unique_ptr<Allele []>& g, bool s)
 {
     if (mutLocus >= 0){
         if (rnd.rU01() < mut)
@@ -145,6 +148,7 @@ void Individual::mutateG(std::unique_ptr<Allele []>& g)
         for (int i = 0; i < hits; ++i){
             ulong locus = rnd.rtop(totalLoci);
             g[locus] = mutateStep(g[locus]);
+            if (s && (g[locus] < 0)) g[locus] = static_cast<Allele>(0);
         }
     }
 }

@@ -40,7 +40,7 @@ public:
     void            setNegLog2Rec(ulong r) {negLog2Rec = r;};
     void			initialize();
     void			mutate();
-    void            mutateG(std::unique_ptr<Allele []>&);
+    void            mutateG(std::unique_ptr<Allele []>&, bool);
     auto            getRecombination(){return rec;}
     void            setRecombination(double r){rec = r;}
     double          calcJ();
