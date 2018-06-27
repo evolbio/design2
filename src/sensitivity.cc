@@ -84,13 +84,14 @@ void GetParam(Param& p, std::istringstream& parmBuf)
     double tmpGen, tmpPop, tmpMutLoc;
     
     parmBuf >> p.runNum >> tmpGen >> tmpPop >> p.mutation >> p.recombination >> p.mutStep >>
-        p.aSD >>p.fitVar >> p.gamma >> tmpMutLoc;
+        p.aSD >>p.fitVar >> p.gamma >> p.stochWt >> tmpMutLoc;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
 
     p.gen = round<int>(tmpGen);
     p.popsize = round<int>(tmpPop);
     p.mutLocus = round<int>(tmpMutLoc);
+    p.stoch = (abs(p.stochWt) < 1e-6) ? false : true;
     
     rndType newseed;
     rndType parmSeed;
@@ -125,9 +126,61 @@ std::string PrintParam(Param& p)
     outString += fmt::format(formatf, "aSD", p.aSD);
     outString += fmt::format(formatf, "fitVar", p.fitVar);
     outString += fmt::format(formatf, "gamma", p.gamma);
+    outString += fmt::format(formatf, "stochWt", p.stochWt);
     outString += fmt::format(format,  "mutLocus", p.mutLocus);
     outString += "\n";
     return outString;
+}
+
+void PrintGDistn(Param& param, std::ostringstream& resultss,
+                 std::vector<double> mean, std::vector<double> sd, std::vector<std::vector<double>> distn)
+{
+    resultss <<  "     ";
+    for (int i = 0; i < param.loci; ++i){
+        resultss << fmt::format((i < 10) ? "{:>7}{:1}" : "{:>6}{:2}", "g", i);
+    }
+    resultss << "\n";
+    
+    resultss <<  " Mean";
+    for (int i = 0; i < param.loci; ++i){
+        resultss << fmt::format("{:8.3f}", mean[i]);
+    }
+    resultss << "\n";
+    
+    resultss <<  "   SD";
+    for (int i = 0; i < param.loci; ++i){
+        resultss << fmt::format("{:8.3f}", sd[i]);
+    }
+    resultss << "\n";
+    
+    for (int j = 0; j < param.distnSteps; ++j){
+        resultss << fmt::format("{:5.1f}", 100.0*(double)j/(double)(param.distnSteps-1));
+        for (int i = 0; i < param.loci; ++i){
+            resultss << fmt::format("{:8.3f}", distn[i][j]);
+        }
+        resultss << "\n";
+    }
+    
+    resultss << "\n\n";
+}
+
+void PrintGCorr(Param& param, std::ostringstream& resultss, std::vector<std::vector<double>> corr)
+{
+    resultss <<  "     ";
+    for (int i = 0; i < param.loci; ++i){
+        resultss << fmt::format((i < 10) ? "{:>6}{:1}" : "{:>5}{:2}", "g", i);
+    }
+    resultss << "\n";
+    
+    for (int i = 0; i < param.loci; ++i){
+        resultss << fmt::format((i < 10) ? "{:>4}{:1}" : "{:>3}{:2}", "g", i);
+        for (int j = 0; j < param.loci; ++j){
+            resultss << fmt::format("{:7.3f}", corr[i][j]);
+        }
+        resultss << "\n";
+    }
+    
+    resultss << "\n\n";
 }
 
 void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
@@ -169,56 +222,38 @@ void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
     const auto& gDistn = stats.getGDistn();
     
     resultss << "Distribution of genotype values, rows are percentiles\n\n";
+    PrintGDistn(param, resultss, gMean, gSD, gDistn);
     
-    resultss <<  "     ";
-    for (int i = 0; i < param.loci; ++i){
-        resultss << fmt::format((i < 10) ? "{:>7}{:1}" : "{:>6}{:2}", "g", i);
-    }
-    resultss << "\n";
-    
-    resultss <<  " Mean";
-    for (int i = 0; i < param.loci; ++i){
-        resultss << fmt::format("{:8.3f}", gMean[i]);
-    }
-    resultss << "\n";
-
-    resultss <<  "   SD";
-    for (int i = 0; i < param.loci; ++i){
-        resultss << fmt::format("{:8.3f}", gSD[i]);
-    }
-    resultss << "\n";
-
-    for (int j = 0; j < param.distnSteps; ++j){
-        resultss << fmt::format("{:5.1f}", 100.0*(double)j/(double)(param.distnSteps-1));
-        for (int i = 0; i < param.loci; ++i){
-            resultss << fmt::format("{:8.3f}", gDistn[i][j]);
-        }
-        resultss << "\n";
-    }
-    
-    resultss << "\n\n";
-
     // print G corr matrix
     
     const auto& gCorr = stats.getGCorr();
     
     resultss << "Correlation of G values\n\n";
+    PrintGCorr(param, resultss, gCorr);
     
-    resultss <<  "     ";
-    for (int i = 0; i < param.loci; ++i){
-        resultss << fmt::format((i < 10) ? "{:>6}{:1}" : "{:>5}{:2}", "g", i);
+    if (param.stoch){
+        // print stoch distn statistics for each locus
+        
+        const auto& mean = stats.getSMean();
+        const auto& sd = stats.getSSD();
+        const auto& distn = stats.getSDistn();
+        
+        resultss << "Distribution of genotype values, rows are percentiles\n\n";
+        PrintGDistn(param, resultss, mean, sd, distn);
+        
+        // print S corr matrix
+        
+        const auto& corr = stats.getSCorr();
+        
+        resultss << "Correlation of stoch values\n\n";
+        PrintGCorr(param, resultss, corr);
+        
+        // print S X G corr matrix
+        
+        const auto& corrsg = stats.getSGCorr();
+        
+        resultss << "Correlation of stoch x genotype values\n\n";
+        PrintGCorr(param, resultss, corrsg);
     }
-    resultss << "\n";
-
-    for (int i = 0; i < param.loci; ++i){
-        resultss << fmt::format((i < 10) ? "{:>4}{:1}" : "{:>3}{:2}", "g", i);
-        for (int j = 0; j < param.loci; ++j){
-            resultss << fmt::format("{:7.3f}", gCorr[i][j]);
-        }
-        resultss << "\n";
-    }
-    
-    resultss << "\n\n";
-
 }
 

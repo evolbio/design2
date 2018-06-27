@@ -13,6 +13,8 @@ double Individual::fitVar;
 double Individual::gamma;
 Loop Individual::loop;
 int Individual::mutLocus;
+double Individual::stochWt;
+bool Individual::stoch;
 ulong Individual::negLog2Rec;
 
 // Algorithm for fast Poisson for lambda < 30
@@ -35,8 +37,10 @@ int MyRandomPoisson(double mean)
 Individual::Individual(const Individual& other)
 {
     genotype = std::unique_ptr<Allele[]> {new Allele[totalLoci]};
+    if (stoch) stochast = std::unique_ptr<Allele[]> {new Allele[totalLoci]};
     for (int i = 0; i < totalLoci; ++i){
         genotype[i] = other.genotype[i];
+        if (stoch) stochast[i] = other.stochast[i];
     }
     fitness = calcFitness();
 }
@@ -45,8 +49,10 @@ Individual::Individual(const Individual& other)
 Individual& Individual::operator=(const Individual& other)
 {
     genotype = std::unique_ptr<Allele[]> {new Allele[totalLoci]};
+    if (stoch) stochast = std::unique_ptr<Allele[]> {new Allele[totalLoci]};
     for (int i = 0; i < totalLoci; ++i){
         genotype[i] = other.genotype[i];
+        if (stoch) stochast[i] = other.stochast[i];
     }
     fitness = calcFitness();
     return *this;
@@ -55,6 +61,8 @@ Individual& Individual::operator=(const Individual& other)
 void Individual::initialize()
 {
     genotype = std::unique_ptr<Allele[]> {new Allele[totalLoci]};
+    // init to zero with {} initializer
+    if (stoch) stochast = std::unique_ptr<Allele[]> {new Allele[totalLoci]{}};
     float p = static_cast<float>(1.0/sqrt(gamma));
     // p0 = 0 by assumption
     genotype[2] = p;                // q0
@@ -79,12 +87,16 @@ void Individual::initialize()
             break;
     }
 
-    if (mutLocus >= 0)
+    if (mutLocus >= 0){
         genotype[mutLocus] = mutateStep(genotype[mutLocus]);
-    else
+        if (stoch) stochast [mutLocus] = mutateStep(stochast[mutLocus]);
+    }
+    else{
         for (int i = 0; i < totalLoci; ++i){
             genotype[i] = mutateStep(genotype[i]);
+            if (stoch) stochast[i] = mutateStep(stochast[i]);
         }
+    }
     fitness = calcFitness();
 }
 
@@ -101,6 +113,8 @@ void Individual::setParam(Param& param)
     gamma = param.gamma;
     loop = param.loop;
     mutLocus = param.mutLocus;
+    stochWt = param.stochWt;
+    stoch = param.stoch;
     negLog2Rec = 1;         // set elsewhere when needed, here is just default value
 }
 
@@ -116,15 +130,21 @@ Allele Individual::mutateStep(Allele a)
 
 void Individual::mutate()
 {
+    mutateG(genotype);
+    if (stoch) mutateG(stochast);
+}
+
+void Individual::mutateG(std::unique_ptr<Allele []>& g)
+{
     if (mutLocus >= 0){
         if (rnd.rU01() < mut)
-            genotype[mutLocus] = mutateStep(genotype[mutLocus]);
+            g[mutLocus] = mutateStep(g[mutLocus]);
     }
     else{
         int hits = MyRandomPoisson(mut*totalLoci);  // about twice as fast as rnd.poisson()
         for (int i = 0; i < hits; ++i){
             ulong locus = rnd.rtop(totalLoci);
-            genotype[locus] = mutateStep(genotype[locus]);
+            g[locus] = mutateStep(g[locus]);
         }
     }
 }
@@ -136,10 +156,14 @@ void SetBabyGenotype(Individual& Parent1, Individual& Parent2, Individual& baby)
     auto& g1 = Parent1.genotype;
     auto& g2 = Parent2.genotype;
     auto& gb = baby.genotype;
+    auto& s1 = Parent1.stochast;
+    auto& s2 = Parent2.stochast;
+    auto& sb = baby.stochast;
     ulong chrFlag = rnd.rbit();        // determines which parent is used for copying
 
     for (int i = 0; i < Parent1.totalLoci; ++i){
         gb[i] = (chrFlag) ? g1[i] : g2[i];
+        if (Individual::stoch) sb[i] = (chrFlag) ? s1[i] : s2[i];
         if (rnd.rU01() < baby.rec) chrFlag ^= 1;        // flip flag if recombination at rate 0.5
     }
     baby.fitness = baby.calcFitness();
@@ -154,6 +178,9 @@ void SetBabyGenotypeLogRec(Individual& Parent1, Individual& Parent2, Individual&
     auto& g1 = Parent1.genotype;
     auto& g2 = Parent2.genotype;
     auto& gb = baby.genotype;
+    auto& s1 = Parent1.stochast;
+    auto& s2 = Parent2.stochast;
+    auto& sb = baby.stochast;
     ulong rawint = rnd.rawint();
     ulong recShift = Individual::negLog2Rec; // -log 2 rec, w/rec = (1/2, 1/4, 1/8, ...), set in Popul
     ulong mask = (1 << recShift) - 1;        // e.g., recShift = 2 => mask = 00...0011, ie, low two bits
@@ -162,6 +189,7 @@ void SetBabyGenotypeLogRec(Individual& Parent1, Individual& Parent2, Individual&
     
     for (int i = 0; i < Parent1.totalLoci; ++i){
         gb[i] = (chrFlag) ? g1[i] : g2[i];
+        if (Individual::stoch) sb[i] = (chrFlag) ? s1[i] : s2[i];
         rawint >>= recShift;                            // move used bits out
         if ((rawint & mask) == mask) chrFlag ^= 1;      // flip flag if recombination
         if ((rbits -= recShift) == 0){                  // reload random bits if all used up
@@ -178,6 +206,7 @@ void SetBabyGenotypeNoRec(Individual& Parent, Individual& Unused __attribute__((
 {
     for (int i = 0; i < Parent.totalLoci; ++i){
         baby.genotype[i] = Parent.genotype[i];
+        if (Individual::stoch) baby.stochast[i] = Parent.stochast[i];
     }
     baby.fitness = baby.calcFitness();
 }
@@ -191,13 +220,16 @@ double Individual::calcJ()
     double a = sqrt(1+gamma);
     if (abs(aSD) > 1e-6) a *= pow(2.0,rnd.normal(0,aSD));   // a = a*2^x, x ~ N(0,aSD)
     // p0 = 0 by assumption
-    double p1 = genotype[0];
-    double p2 = genotype[1];
-    double q0 = genotype[2];
-    double q1 = genotype[3];
-    double q2 = genotype[4];
-    double r  = genotype[5];
-    double k  = genotype[6];
+    double p1 = genotype[0] * ((stoch) ? pow(2.0,rnd.normal(0,abs(stochast[0]))) : 1.0);
+    double p2 = genotype[1] * ((stoch) ? pow(2.0,rnd.normal(0,abs(stochast[1]))) : 1.0);
+    double q0 = genotype[2] * ((stoch) ? pow(2.0,rnd.normal(0,abs(stochast[2]))) : 1.0);
+    double q1 = genotype[3] * ((stoch) ? pow(2.0,rnd.normal(0,abs(stochast[3]))) : 1.0);
+    double q2 = genotype[4] * ((stoch) ? pow(2.0,rnd.normal(0,abs(stochast[4]))) : 1.0);
+    double r, k;
+    if (loop == Loop::dclose){
+        r = genotype[5] * ((stoch) ? pow(2.0,rnd.normal(0,abs(stochast[5]))) : 1.0);
+        k = genotype[6] * ((stoch) ? pow(2.0,rnd.normal(0,abs(stochast[6]))) : 1.0);
+    }
     std::vector<double> num;
     std::vector<double> den;
     switch (loop){

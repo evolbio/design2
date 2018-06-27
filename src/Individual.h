@@ -5,9 +5,7 @@
 #include "typedefs.h"
 #include "Individual.h"
 
-// Test performance for float vs double for fitness. Could use float for fitness with about 6-7 places of precision because pop sizes will be less than 10^6 and so any fitness differences less than the pop size will be effectively neutral, if pop size gets to be on order of 10^6, should go to double precision. However, performance for double may be same, and not much space taken up.
-
-// Use array of floats for genotype, each locus has a value on [-MAX,MAX]. For initial test problem, set phenotype, P, as sum of allelic values across all loci, and fitness as exp(-P^2/2*S^2). Then can test standard mut-selection pattern for one locus.
+// Use array of floats for genotype.
 
 // Each individual is haploid hermaphrodite, so no distinct sexes
 // Form diploid zygote and then make a gamete to produce haploid baby, ie, haploid dominant life cycle
@@ -15,6 +13,8 @@
 
 // Make global parameters as static variables for class, so can access them without always passing Param
 // Static variables must be declared in Individual.cc, and values initialized by main program
+
+// stochast is array of phenotypic stochasticity Alleles, with one-to-one map of stochasticity to genotype alleles. For recombination, stochast alleles linked to genotype alleles, ie, no recombination between each genotype and its associated stochasticity allele. Value of stochast is standard deviation of Gaussian fluctuations, each fluctuation weighted by param stochWt. If stochWt == 0, then param stoch = false and ignore.
 
 class Individual;
 
@@ -40,12 +40,14 @@ public:
     void            setNegLog2Rec(ulong r) {negLog2Rec = r;};
     void			initialize();
     void			mutate();
+    void            mutateG(std::unique_ptr<Allele []>&);
     auto            getRecombination(){return rec;}
     void            setRecombination(double r){rec = r;}
     double          calcJ();
     double			calcFitness();
     double          getFitness(){return fitness;};
-    auto&   	    getGenotype(){return genotype;};
+    auto&           getGenotype(){return genotype;};
+    auto&           getStochast(){return stochast;};
     Allele          mutateStep(Allele a);
 private:
     static double	mut;            // per genome mutation rate, param.mutation is per locus mutation rate
@@ -58,7 +60,10 @@ private:
     static double   gamma;          // weighting of performance components
     static Loop     loop;           // control loop type
     static int      mutLocus;       // if >= 0, then mutate only this locus
+    static double   stochWt;        // weighting of stochastic fluctuations
+    static bool     stoch;          // (stochWt == 0) ? false : true
     std::unique_ptr<Allele[]> genotype;
+    std::unique_ptr<Allele[]> stochast;  // phenotypic stochasticity
     double          fitness;
 };
 

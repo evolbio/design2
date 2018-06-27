@@ -75,29 +75,53 @@ void Population::reproduceNoMutRec(Population& oldPop)
     ind[0].setRecombination(r);
 }
 
+// If using stochastic loci for phenotypic variability, then simply double number of loci for allocation of vectors and matrix, and use 1..L for genotype and L+1,...,2L for stochastic alleles
+
 void Population::calcStats(Param& param, SumStat& stats)
 {
     int i, j;
-    std::vector<std::vector<double>> gMatrix(param.loci,std::vector<double>(param.popsize));
+    int loci = param.loci;
+    int lociTot = (param.stoch) ? 2*loci : loci;
+    std::vector<std::vector<double>> gMatrix(lociTot,std::vector<double>(param.popsize));
     
     for (i = 0; i < popSize; ++i){
         auto& genotype = ind[i].getGenotype();
-        for (j = 0; j < param.loci; ++j){
+        auto& stochast = ind[i].getStochast();
+        for (j = 0; j < loci; ++j){
             gMatrix[j][i] = genotype[j];
+            if (param.stoch) gMatrix[loci+j][i] = stochast[j];
         }
     }
     auto& gMean = stats.getGMean();
     auto& gSD = stats.getGSD();
     auto& gCorr = stats.getGCorr();
-    for (i = 0; i < param.loci; ++i){
+    auto& sMean = stats.getSMean();
+    auto& sSD = stats.getSSD();
+    auto& sCorr = stats.getSCorr();
+    for (i = 0; i < loci; ++i){
         gMean[i] = vecMean<double>(gMatrix[i]);
         gSD[i] = vecSD<double>(gMatrix[i], gMean[i]);
+        if (param.stoch){
+            sMean[i] = vecMean<double>(gMatrix[loci+i]);
+            sSD[i] = vecSD<double>(gMatrix[loci+i], sMean[i]);
+        }
     }
-    for (i = 0; i < param.loci; ++i){
-        for (j = i; j < param.loci; ++j){
+    for (i = 0; i < loci; ++i){
+        for (j = i; j < loci; ++j){
+            // corr of g loci
             double cov = vecCov(gMatrix[i], gMatrix[j], gMean[i], gMean[j]);
             double prodSD = gSD[i]*gSD[j];
             gCorr[i][j] = gCorr[j][i] = (prodSD < 1e-10) ? 0.0 : cov/(prodSD);
+            if (param.stoch){
+                // corr of s loci
+                double covS = vecCov(gMatrix[loci+i], gMatrix[loci+j], sMean[i], sMean[j]);
+                double prodSDS = sSD[i]*sSD[j];
+                sCorr[i][j] = sCorr[j][i] = (prodSDS < 1e-10) ? 0.0 : covS/(prodSDS);
+                // cross corr of g[i] and s[j]
+                double covSG = vecCov(gMatrix[i], gMatrix[loci+j], gMean[i], sMean[j]);
+                double prodSDSG = gSD[i]*sSD[j];
+                sCorr[i][j] = sCorr[j][i] = (prodSDSG < 1e-10) ? 0.0 : covSG/(prodSDSG);
+            }
         }
     }
     
@@ -106,9 +130,11 @@ void Population::calcStats(Param& param, SumStat& stats)
     std::vector<unsigned> ptiles(param.distnSteps);
     std::iota(ptiles.begin(), ptiles.end(), 0);     // assign [0..n-1] for distnSteps = n, use n = 101
     auto& gDistn = stats.getGDistn();
+    auto& sDistn = stats.getSDistn();
 
-    for (i = 0; i < param.loci; ++i){
+    for (i = 0; i < loci; ++i){
         gDistn[i] = percentiles_interpol<std::vector<double>>(gMatrix[i], ptiles);
+        if (param.stoch) sDistn[i] = percentiles_interpol<std::vector<double>>(gMatrix[loci+i], ptiles);
     }
     
     // fitness distn

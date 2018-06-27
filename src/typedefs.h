@@ -21,6 +21,8 @@ struct Param {
     int   mutLocus;
     double mutation;
     double recombination;
+    double stochWt;        // weighting of stochastic fluctuations
+    bool   stoch;          // (stochWt == 0) ? false : true
     Allele mutStep;     // max allelic value
     double aSD;
     double fitVar;      // width of fitness gradient

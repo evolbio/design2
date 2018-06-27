@@ -10,26 +10,28 @@ mutStep     mutation = current val +/- rnd.rUniform(-mutStep,mutStep)
 aSD         sd for plant parameter a, in which a = A*2^x, x dist N(0,aSD)
 fitVar      1/steepness of fitness gradient
 gamma       weighting of step vs perturb performance
+stochWt     weighting of stochastic phenotypic fluctuations
 mutLocus    < 0, mutate all loci; >= 0 && < numLoci => mutate one locus
 
 REPLICATES  = 3
 CONTROL PARAMETERS:
 disStp      = 101   // number of percentile steps to collect, 101=>[0..100]
-loop        = 2;    // 0 => open; 1 => close; 2 => double close, sets numLoci
+loop        = 1;    // 0 => open; 1 => close; 2 => double close, sets numLoci
 seed        = 7777  // random seed if newseed is zero
 newseed     = 1     // !0 => get seed from file rather than here
 END
 DESIGN PARAMETERS:
 Param    Levels     Center     Increm  Scale
 
-gen        1        2e2          2.0     E
+gen        1        4e0          2.0     E
 popsize    1        5e2          2.0     E
 mut        1        1e-2         4.0     E
 rec        1        5.0e-1       2.0     E
-mutStep    1        1e0          2.0     E
+mutStep    1        5e-1         2.0     E
 aSD        1        0e-1         2.0     E
 fitVar     1        1e-2         2.0     E
 gamma      1        2e0          2.0     E
-mutLocus   1        4e0          1.0     L
+stochWt    1        2e-1         2.0     E
+mutLocus   1        -3e0         1.0     L
 
 END
