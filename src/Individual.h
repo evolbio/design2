@@ -36,7 +36,7 @@ public:
     Individual(){};
     Individual(const Individual& other);                // copy constructor
     Individual&     operator=(const Individual& other); // assignment constructor
-    void            setParam(Param& param);     // set static variables for class
+    static void     setParam(Param& param);             // set static variables for class
     void            setNegLog2Rec(ulong r) {negLog2Rec = r;};
     void			initialize();
     void			mutate();

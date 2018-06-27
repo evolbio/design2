@@ -116,9 +116,10 @@ Allele Individual::mutateStep(Allele a)
 
 void Individual::mutate()
 {
-    if (mutLocus >= 0)
+    if (mutLocus >= 0){
         if (rnd.rU01() < mut)
             genotype[mutLocus] = mutateStep(genotype[mutLocus]);
+    }
     else{
         int hits = MyRandomPoisson(mut*totalLoci);  // about twice as fast as rnd.poisson()
         for (int i = 0; i < hits; ++i){

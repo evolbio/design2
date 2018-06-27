@@ -13,7 +13,7 @@ Population::Population(Param& param)
     hvec = std::vector<uint64_t>(popSize);
     avec = std::vector<uint32_t>(popSize);
 
-    ind[0].setParam(param);
+    Individual::setParam(param);            // static function to set static variables
 	for (int i = 0; i < popSize; i++){
 		ind[i].initialize();
         indFitness[i] = ind[i].getFitness();
