@@ -83,13 +83,15 @@ void LifeCycle(Param& param, std::ostringstream& resultss)
 
 void GetParam(Param& p, std::istringstream& parmBuf)
 {
-    double tmpGen, tmpPop, tmpMutLoc;
+    double tmpLoop, tmpGen, tmpPop, tmpMutLoc;
     
-    parmBuf >> p.runNum >> tmpGen >> tmpPop >> p.mutation >> p.recombination >> p.mutStep >>
+    parmBuf >> p.runNum >> tmpLoop >> tmpGen >> tmpPop >> p.mutation >> p.recombination >> p.mutStep >>
         p.aSD >>p.fitVar >> p.gamma >> p.stochWt >> tmpMutLoc;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
 
+    p.loop = static_cast<Loop>(round<int>(tmpLoop));
+    p.loci = (p.loop == Loop::dclose) ? 7 : 5;
     p.gen = round<int>(tmpGen);
     p.popsize = round<int>(tmpPop);
     p.mutLocus = round<int>(tmpMutLoc);
@@ -97,13 +99,10 @@ void GetParam(Param& p, std::istringstream& parmBuf)
     
     rndType newseed;
     rndType parmSeed;
-    int loop;
-    parmBuf >> p.distnSteps >> loop >> parmSeed >> newseed;
+    parmBuf >> p.distnSteps >> parmSeed >> newseed;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
     
-    p.loop = static_cast<Loop>(loop);
-    p.loci = (p.loop == Loop::dclose) ? 7 : 5;
     if (p.mutLocus >= p.loci)
         ThrowError(__FILE__, __LINE__, "Mutated locus number greater than number loci.");
 	if (!newseed)
