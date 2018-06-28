@@ -173,8 +173,9 @@ double stepPerformance(const std::vector<double>& num, const std::vector<double>
 	my_params params = {num, den};
 	auto dim = den.size()-1;	// dimensions of state space model for dynamics
 	gsl_odeiv2_system sys = {deriv, NULL, dim, &params};
+    // see GSL docs for alternative algorithms
 	gsl_odeiv2_driver *d =
-		gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk8pd, 1e-6, 1e-6, 0.0);
+		gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rkf45, 1e-6, 1e-6, 0.0);
 	double t = 0.0;
 	double* x = new double[den.size()-1](); // () at end causes zero initialization
 	double denBack = den.back();

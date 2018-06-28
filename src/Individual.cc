@@ -137,6 +137,7 @@ void Individual::mutate()
     if (stoch) mutateG(stochast, true);
 }
 
+// s == true => set negative values to zero, used for stochastic parameters which are standard deviations and so must be nonnegative
 void Individual::mutateG(std::unique_ptr<Allele []>& g, bool s)
 {
     if (mutLocus >= 0){
@@ -224,15 +225,15 @@ double Individual::calcJ()
     double a = sqrt(1+gamma);
     if (abs(aSD) > 1e-6) a *= pow(2.0,rnd.normal(0,aSD));   // a = a*2^x, x ~ N(0,aSD)
     // p0 = 0 by assumption
-    double p1 = genotype[0] * ((stoch) ? pow(2.0,rnd.normal(0,abs(stochast[0]))) : 1.0);
-    double p2 = genotype[1] * ((stoch) ? pow(2.0,rnd.normal(0,abs(stochast[1]))) : 1.0);
-    double q0 = genotype[2] * ((stoch) ? pow(2.0,rnd.normal(0,abs(stochast[2]))) : 1.0);
-    double q1 = genotype[3] * ((stoch) ? pow(2.0,rnd.normal(0,abs(stochast[3]))) : 1.0);
-    double q2 = genotype[4] * ((stoch) ? pow(2.0,rnd.normal(0,abs(stochast[4]))) : 1.0);
+    double p1 = genotype[0] * ((stoch) ? pow(2.0,rnd.normal(0,stochast[0])) : 1.0);
+    double p2 = genotype[1] * ((stoch) ? pow(2.0,rnd.normal(0,stochast[1])) : 1.0);
+    double q0 = genotype[2] * ((stoch) ? pow(2.0,rnd.normal(0,stochast[2])) : 1.0);
+    double q1 = genotype[3] * ((stoch) ? pow(2.0,rnd.normal(0,stochast[3])) : 1.0);
+    double q2 = genotype[4] * ((stoch) ? pow(2.0,rnd.normal(0,stochast[4])) : 1.0);
     double r, k;
     if (loop == Loop::dclose){
-        r = genotype[5] * ((stoch) ? pow(2.0,rnd.normal(0,abs(stochast[5]))) : 1.0);
-        k = genotype[6] * ((stoch) ? pow(2.0,rnd.normal(0,abs(stochast[6]))) : 1.0);
+        r = genotype[5] * ((stoch) ? pow(2.0,rnd.normal(0,stochast[5])) : 1.0);
+        k = genotype[6] * ((stoch) ? pow(2.0,rnd.normal(0,stochast[6])) : 1.0);
     }
     std::vector<double> num;
     std::vector<double> den;
