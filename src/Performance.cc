@@ -288,3 +288,4 @@ double integrandStep(double t, void *p)
 	double z = 1.0 - gsl_spline_eval(params->spline, t, params->acc);
 	return z*z;
 }
+

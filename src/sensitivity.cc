@@ -11,6 +11,7 @@
 #include "SAFtimer.h"
 
 #include "Population.h"
+#include "Performance.h"
 
 const int 	linesPerRun = 3;
 SAFrand_pcg<pcgT> rnd;
@@ -41,6 +42,7 @@ std::string Control(std::istringstream& parmBuf)
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
 	rnd.setRandSeed(seed);
+    setGSLErrorHandle(1);       // 1 => turn on my error handler, 0 => turn off handler
 	for (i = first; i <= last; i++){
 		GetParam(param, parmBuf);
 		LifeCycle(param, resultss);
