@@ -31,7 +31,7 @@ OBJFILES   = $(CXXFILES:.cc=.o)
 # proto directory
 OCLIENT    = sim_client.o
 CXXCLIENT  = src/sim_client.cc
-CLIENT     = $(NAME)_client$(SUFFIX)
+CLIENT     = $(NAME)_client
 DEFS       = -DCLIENT_LINK
 PROTO_PATH = proto
 POBJFILES = $(PROTO_PATH)/simcontrol.pb.o $(PROTO_PATH)/simcontrol.grpc.pb.o

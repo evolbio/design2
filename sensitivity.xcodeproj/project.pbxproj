@@ -12,6 +12,7 @@
 		AA2B46C720D22A52002DDDFA /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		AA68C0CF20DF4CA000F3FDA1 /* Performance.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Performance.cc; path = src/Performance.cc; sourceTree = "<group>"; };
 		AA68C0D020DF4CA000F3FDA1 /* Performance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Performance.h; path = src/Performance.h; sourceTree = "<group>"; };
+		AA6B255120E5F2EC00B6D703 /* sim_client.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sim_client.cc; path = ../../grpcControl/src/sim_client.cc; sourceTree = "<group>"; };
 		AA8E1E0820D3955500935CDC /* sensitivity.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sensitivity.cc; path = src/sensitivity.cc; sourceTree = "<group>"; };
 		AA8E1E0920D3955500935CDC /* main-alone.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "main-alone.cc"; path = "src/main-alone.cc"; sourceTree = "<group>"; };
 		AA8E1E0A20D3955500935CDC /* typedefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = typedefs.h; path = src/typedefs.h; sourceTree = "<group>"; };
@@ -43,6 +44,7 @@
 		AA8E1E0520D3942C00935CDC /* misc */ = {
 			isa = PBXGroup;
 			children = (
+				AA6B255120E5F2EC00B6D703 /* sim_client.cc */,
 				AA8E1E0E20D3958600935CDC /* SAFrand_pcg.h */,
 				AA8E1E0D20D3958600935CDC /* SAFtimer.h */,
 				AA175BB420D9272C008DB808 /* util.h */,
@@ -94,6 +96,20 @@
 			passBuildSettingsInEnvironment = 1;
 			productName = sensitivity.osx;
 		};
+		AA6B254D20E5F23300B6D703 /* sensitivity_client */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = client;
+			buildConfigurationList = AA6B254E20E5F23300B6D703 /* Build configuration list for PBXLegacyTarget "sensitivity_client" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "";
+			dependencies = (
+			);
+			name = sensitivity_client;
+			passBuildSettingsInEnvironment = 1;
+			productName = sensitivity.osx;
+		};
 /* End PBXLegacyTarget section */
 
 /* Begin PBXProject section */
@@ -121,6 +137,7 @@
 			projectRoot = "";
 			targets = (
 				AA68C0CB20DCA5D900F3FDA1 /* sensitivity */,
+				AA6B254D20E5F23300B6D703 /* sensitivity_client */,
 			);
 		};
 /* End PBXProject section */
@@ -254,6 +271,31 @@
 			};
 			name = Release;
 		};
+		AA6B254F20E5F23300B6D703 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		AA6B255020E5F23300B6D703 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -271,6 +313,15 @@
 			buildConfigurations = (
 				AA68C0CD20DCA5D900F3FDA1 /* Debug */,
 				AA68C0CE20DCA5D900F3FDA1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA6B254E20E5F23300B6D703 /* Build configuration list for PBXLegacyTarget "sensitivity_client" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA6B254F20E5F23300B6D703 /* Debug */,
+				AA6B255020E5F23300B6D703 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
