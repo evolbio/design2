@@ -17,21 +17,21 @@ REPLICATES  = 1
 CONTROL PARAMETERS:
 disStp      = 101   // number of percentile steps to collect, 101=>[0..100]
 seed        = 7777  // random seed if newseed is zero
-newseed     = 1     // !0 => get seed from file rather than here
+newseed     = 1     // 0 => use seed here; 1 => get seed from file
 END
 DESIGN PARAMETERS:
 Param    Levels     Center     Increm  Scale
 
-loop       3        2.0e0        1.0     L
-gen        1        4e0          2.0     E
+loop       3        1.0e0        1.0     L
+gen        3        4e0          2.0     E
 popsize    1        5e2          2.0     E
 mut        1        1e-2         4.0     E
 rec        1        5.0e-1       2.0     E
 mutStep    1        5e-1         2.0     E
-aSD        1        0e-1         2.0     E
+aSD        3        2.5e-1       0.25    L
 fitVar     1        1e-2         2.0     E
 gamma      1        2e0          2.0     E
-stochWt    1        1e-1         2.0     E
+stochWt    3        2.5e-1       0.25    L
 mutLocus   1        -3e0         1.0     L
 
 END
