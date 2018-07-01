@@ -40,7 +40,15 @@ std::string Control(std::istringstream& parmBuf)
     parmBuf >> first >> last >> param.rndSeed;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
-	rnd.setRandSeed(param.rndSeed);
+    // seed may be 64bit, but rndType may be 32 bit, if so, truncate seed
+    if (sizeof(rndType) != sizeof(unsigned long)){
+        rndType seed = static_cast<rndType>(param.rndSeed);
+        param.rndSeed = seed;
+        rnd.setRandSeed(seed);
+    }
+    else{
+        rnd.setRandSeed(param.rndSeed);
+    }
     setGSLErrorHandle(1);       // 1 => turn on my error handler, 0 => turn off handler
 	for (i = first; i <= last; i++){
 		GetParam(param, parmBuf);
@@ -99,15 +107,23 @@ void GetParam(Param& p, std::istringstream& parmBuf)
         ThrowError(__FILE__, __LINE__, "Mutated locus number greater than number loci.");
 
     int newseed;
-    rndType seed;
+    unsigned long seed;
     parmBuf >> p.distnSteps >> seed >> newseed;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
     
+    std::cout << p.rndSeed << std::endl;
+    // seed may be 64bit, but rndType may be 32 bit, if so, truncate seed
     if (!newseed){
-        p.rndSeed = seed;
-		rnd.setRandSeed(p.rndSeed);	// initial random numbers
+        if ((sizeof(rndType) != sizeof(unsigned long)) && seed > UINT32_MAX)
+            ThrowError(__FILE__, __LINE__, "64 bit seed in design file > 32 bit generator type");
+        else{
+            p.rndSeed = seed;
+            rnd.setRandSeed(p.rndSeed);	// initial random numbers
+        }
     }
+    std::cout << seed << " " << p.rndSeed << std::endl;
+
 }
 
 std::string PrintParam(Param& p)
@@ -117,7 +133,7 @@ std::string PrintParam(Param& p)
     std::string formatf = "{:<10} = {:>9.3e}\n";
     outString += fmt::format(format,  "Run", p.runNum);
     outString += fmt::format(format,  "disStp", p.distnSteps);
-    outString += fmt::format(format,  "seed", p.rndSeed);
+    outString += fmt::format("{:<10} = {}\n",  "seed", p.rndSeed);
     outString += fmt::format(format,  "loop", static_cast<int>(p.loop));
     outString += fmt::format(format,  "gen", p.gen);
     outString += fmt::format(format,  "loci", p.loci);

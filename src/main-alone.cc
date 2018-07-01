@@ -83,6 +83,7 @@ std::string WriteParmBuf(int first, std::fstream& randFile, std::ifstream& param
     std::string tmp;
     rndType seed;
     for (unsigned i = 0; i < 11; ++i) randFile >> tmp;
+    // be careful if rndType is 32 bit and seed in file is 64 bit
     randFile >> seed;
     std::string buf;
 	for (int i = 0; i < linesPerRun; ++i){

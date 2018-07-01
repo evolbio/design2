@@ -21,7 +21,7 @@ struct Param {
     int   loci;
     int   popsize;
     int   mutLocus;
-    rndType rndSeed;
+    unsigned long rndSeed;  // seed is 64bit, must type cast if rndType is 32bit
     double mutation;
     double recombination;
     double stochWt;        // weighting of stochastic fluctuations

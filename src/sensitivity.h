@@ -4,7 +4,8 @@
 
 #include "SAFrand_pcg.h"
 
-using pcgT = pcg64;     // pcg32 or pcg64
+// pcg32 or pcg64 for pcgT; using 32bit not tested, use care with seeds and test
+using pcgT = pcg64;
 using rndType = pcgT::result_type;
 extern SAFrand_pcg<pcgT> rnd;
 extern const int linesPerRun;
