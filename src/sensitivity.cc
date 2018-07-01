@@ -112,7 +112,6 @@ void GetParam(Param& p, std::istringstream& parmBuf)
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
     
-    std::cout << p.rndSeed << std::endl;
     // seed may be 64bit, but rndType may be 32 bit, if so, truncate seed
     if (!newseed){
         if ((sizeof(rndType) != sizeof(unsigned long)) && seed > UINT32_MAX)
@@ -122,8 +121,6 @@ void GetParam(Param& p, std::istringstream& parmBuf)
             rnd.setRandSeed(p.rndSeed);	// initial random numbers
         }
     }
-    std::cout << seed << " " << p.rndSeed << std::endl;
-
 }
 
 std::string PrintParam(Param& p)
