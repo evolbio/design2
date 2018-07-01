@@ -1,7 +1,7 @@
 #ifndef _Individual_h
 #define _Individual_h 1
 
-#include "sensitivity.h"
+#include APPL_H
 #include "typedefs.h"
 #include "Individual.h"
 

@@ -2,6 +2,8 @@
 #ifndef _typedefs_h
 #define _typedefs_h 1
 
+#include APPL_H
+
 using schar = signed char;
 using uchar = unsigned char;
 // using uint  = unsigned int;
@@ -19,6 +21,7 @@ struct Param {
     int   loci;
     int   popsize;
     int   mutLocus;
+    rndType rndSeed;
     double mutation;
     double recombination;
     double stochWt;        // weighting of stochastic fluctuations

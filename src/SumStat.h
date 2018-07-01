@@ -3,7 +3,7 @@
 #ifndef _SumStat_h
 #define _SumStat_h 1
 
-#include "sensitivity.h"
+#include APPL_H
 #include "typedefs.h"
 
 class SumStat

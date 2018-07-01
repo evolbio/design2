@@ -5,8 +5,8 @@
 #include <iostream>
 #include <climits>
 
+#include APPL_H
 #include "fmt/format.h"
-#include "sensitivity.h"
 #include "SAFrand_pcg.h"
 #include "SAFtimer.h"
 
@@ -34,14 +34,13 @@ std::string Control(std::istringstream& parmBuf)
 {
     Param param;		
     int i, first, last;
-    rndType seed;
     std::ostringstream resultss;
     
     std::string temp{parmBuf.str()};
-    parmBuf >> first >> last >> seed;
+    parmBuf >> first >> last >> param.rndSeed;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
-	rnd.setRandSeed(seed);
+	rnd.setRandSeed(param.rndSeed);
     setGSLErrorHandle(1);       // 1 => turn on my error handler, 0 => turn off handler
 	for (i = first; i <= last; i++){
 		GetParam(param, parmBuf);
@@ -94,19 +93,21 @@ void GetParam(Param& p, std::istringstream& parmBuf)
     p.loci = (p.loop == Loop::dclose) ? 7 : 5;
     p.gen = round<int>(tmpGen);
     p.popsize = round<int>(tmpPop);
-    p.mutLocus = round<int>(tmpMutLoc);
     p.stoch = (abs(p.stochWt) < 1e-6) ? false : true;
-    
-    rndType newseed;
-    rndType parmSeed;
-    parmBuf >> p.distnSteps >> parmSeed >> newseed;
+    p.mutLocus = round<int>(tmpMutLoc);
+    if (p.mutLocus >= p.loci)
+        ThrowError(__FILE__, __LINE__, "Mutated locus number greater than number loci.");
+
+    int newseed;
+    rndType seed;
+    parmBuf >> p.distnSteps >> seed >> newseed;
     if (parmBuf.bad())
         ThrowError(__FILE__, __LINE__, "Failed reading from parameter string stream.");
     
-    if (p.mutLocus >= p.loci)
-        ThrowError(__FILE__, __LINE__, "Mutated locus number greater than number loci.");
-	if (!newseed)
-		rnd.setRandSeed(parmSeed);	// initial random numbers
+    if (!newseed){
+        p.rndSeed = seed;
+		rnd.setRandSeed(p.rndSeed);	// initial random numbers
+    }
 }
 
 std::string PrintParam(Param& p)
@@ -116,6 +117,7 @@ std::string PrintParam(Param& p)
     std::string formatf = "{:<10} = {:>9.3e}\n";
     outString += fmt::format(format,  "Run", p.runNum);
     outString += fmt::format(format,  "disStp", p.distnSteps);
+    outString += fmt::format(format,  "seed", p.rndSeed);
     outString += fmt::format(format,  "loop", static_cast<int>(p.loop));
     outString += fmt::format(format,  "gen", p.gen);
     outString += fmt::format(format,  "loci", p.loci);
