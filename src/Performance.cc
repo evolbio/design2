@@ -177,7 +177,6 @@ double stepPerformance(const std::vector<double>& num, const std::vector<double>
 	gsl_odeiv2_driver *d =
 		gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rkf45, 1e-6, 1e-6, 0.0);
 	double t = 0.0;
-	double* x = new double[den.size()-1](); // () at end causes zero initialization
 	double denBack = den.back();
 	
 	// coefficients to get output, initialize with values for each case, max dim is 4, so use that
@@ -223,11 +222,12 @@ double stepPerformance(const std::vector<double>& num, const std::vector<double>
 	// initial value is zero, if order den=num, then ratio of highest order terms,
 	// order num>den should not happen
 	y[0] = (den.size() > num.size()) ? 0.0 : num.back()/den.back(); 
+    std::vector<double> x(den.size()-1,0); // 0 at end causes zero initialization
 	for (int i = 1; i <= steps; i++){
 		// add one to tmax, so that interpolation extends past boundary for integration
 		// otherwise, can get an error when interpolating close to the upper boundary
 	  	double ti = i * (tmax+1.0) / static_cast<double>(steps);
-	  	int status = gsl_odeiv2_driver_apply(d, &t, ti, x);
+	  	int status = gsl_odeiv2_driver_apply(d, &t, ti, x.data());
 		assert(status == GSL_SUCCESS);
 		time[i] = t;
 		y[i] = 0;
@@ -239,7 +239,6 @@ double stepPerformance(const std::vector<double>& num, const std::vector<double>
 			std::cout << fmt::format("{:7.3f} {:8.6f}\n", time[i], y[i]);
 	}
 	gsl_odeiv2_driver_free (d);
-	delete [] x;
 	
 	gsl_interp_accel *acc = gsl_interp_accel_alloc();
     gsl_spline *spline = gsl_spline_alloc(gsl_interp_cspline, steps);
