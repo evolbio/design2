@@ -2,8 +2,9 @@
 
 from subprocess import check_output
 import argparse
+import re
 
-proc = '_client'
+proc = 'sensitivity_client'
 command = ['ps', 'x', '-o', 'pid,%cpu,%mem,command', '|', 'grep']
 allhosts = ["fisher", "alice2", "rex", "ficus", "batty", "localhost"]
 
@@ -23,11 +24,14 @@ else:
 if (args.proc != None):
 	proc = args.proc
 
-print ("Running:", ' '.join(['ssh', 'host'] + command + [proc]))
+#print ("Running:", ' '.join(['ssh', 'host'] + command + [proc]))
 
 for h in hosts:
 	output = check_output(['ssh', h] + command + [proc])
 	print(h + ':')
 	for line in output.splitlines():
-		if not b'statusClient' in line and not b'grep' in line:
-			print("  " + line.decode("utf-8"))
+		line = line.decode("utf-8")
+		if not 'statusClient' in line and not 'grep' in line:
+			line = re.sub('/.*/', '', line)
+			print("  " + line)
+print()
