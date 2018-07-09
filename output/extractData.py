@@ -43,11 +43,12 @@ def read_runs(infile, outfile):
 	param = {}
 	for line in infile:
 		fields = line.split()
+		# param group
 		if not line.isspace() and fields[0] == "Run":
 			print("{} {} {}".format(fields[0], fields[1], fields[2]))
 			group = 1
 			if not firstrun:
-				print_data(param, fdistn, outfile, False)
+				print_data(param, fdistn, pdistn, outfile, False)
 				param = {}
 				# reset all dicts
 			firstrun = False
@@ -60,6 +61,7 @@ def read_runs(infile, outfile):
 				fdistn = {}
 				distn = []
 			continue
+		# fitness distn group
 		if group == 2:
 			if not line.isspace() and (fields[0] == "Mean" or fields[0] == "SD"):
 				fdistn[fields[0]] = fields[1]
@@ -73,13 +75,31 @@ def read_runs(infile, outfile):
 				start = False
 				pdistn = {}
 				distn = []
+			continue
+		if group == 3:
+			if not line.isspace() and (fields[0] == "Mean" or fields[0] == "SD"):
+				pdistn[fields[0]] = fields[1]
+				start = True
+			elif not line.isspace() and start:
+				distn.append([float(fields[0]),
+					str(float(fields[1])).replace("e", "*10^")])
+			elif line.isspace and start:
+				pdistn["distn"] = distn
+				group = 4
+				start = False
+				gdistn = []
+				distn = []
+			continue
 			
-	print_data(param, fdistn, outfile, True)
+	print_data(param, fdistn, pdistn, outfile, True)
 	
-#def print_distn(distn, name, outfile):
-	
-	
-def print_data(param, fdistn, outfile, last):
+def print_distn(distn, name, outfile):
+	outfile.write(("<|\"{}\" -> <| \"mean\" -> {}, \"sd\" -> {}" +
+			", \"distn\" -> {}|>|>").format(name, (distn["Mean"]).replace("e", "*10^"), 
+			(distn["SD"]).replace("e", "*10^"), 
+			str(distn["distn"]).replace("[", "{").replace("]", "}").replace("'","")))
+
+def print_data(param, fdistn, pdistn, outfile, last):
 	outfile.write("<|")
 	outfile.write("<|\"param\" -> <|")
 	first = True
@@ -90,37 +110,14 @@ def print_data(param, fdistn, outfile, last):
 		# change e -> E because MMA only recognizes E for sci notation
 		outfile.write("\"{}\" -> {}".format(k, param[k].replace("e", "*10^")))
 	outfile.write("|>|>,")
-	outfile.write(("<|\"fdistn\" -> <| \"mean\" -> {}, \"sd\" -> {}" +
-			", \"distn\" -> {}|>|>|>").format((fdistn["Mean"]).replace("e", "*10^"), 
-			(fdistn["SD"]).replace("e", "*10^"), 
-			str(fdistn["distn"]).replace("[", "{").replace("]", "}").replace("'","")))
+	print_distn(fdistn, "fdistn", outfile)
+	outfile.write(",")
+	print_distn(pdistn, "pdistn", outfile)
+	outfile.write("|>")
 	if not last:
 		outfile.write(",")
 	
 main()
-
-
-# newrun = False
-# firstrun = True
-# for line in infile:
-# 	fields = line.split()
-# 	if not line.isspace() and fields[0] is "Run":
-# 		param = None
-# 		fitness = None
-# 		perform = None
-# 		genotype = None
-# 		stoch = None
-# 		if not firstrun:
-# 			outfile.write(",\n")
-# 		else:
-# 			firstrun = False
-# 		setnum = 0
-# 		run = fields[2]
-# 	if startparam:
-# 		if line.isspace(): 
-# 			setnum = False
-# 		elif fields[0] not "recT":
-# 			param.append()
 
 
 # Dataset[{
