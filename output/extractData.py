@@ -93,14 +93,7 @@ def read_runs(infile, outfile):
 			
 	print_data(param, fdistn, pdistn, outfile, True)
 	
-def print_distn(distn, name, outfile):
-	outfile.write(("<|\"{}\" -> <| \"mean\" -> {}, \"sd\" -> {}" +
-			", \"distn\" -> {}|>|>").format(name, (distn["Mean"]).replace("e", "*10^"), 
-			(distn["SD"]).replace("e", "*10^"), 
-			str(distn["distn"]).replace("[", "{").replace("]", "}").replace("'","")))
-
-def print_data(param, fdistn, pdistn, outfile, last):
-	outfile.write("<|")
+def print_param(param, outfile):
 	outfile.write("<|\"param\" -> <|")
 	first = True
 	for k in param:
@@ -110,6 +103,16 @@ def print_data(param, fdistn, pdistn, outfile, last):
 		# change e -> E because MMA only recognizes E for sci notation
 		outfile.write("\"{}\" -> {}".format(k, param[k].replace("e", "*10^")))
 	outfile.write("|>|>,")
+
+def print_distn(distn, name, outfile):
+	outfile.write(("<|\"{}\" -> <| \"mean\" -> {}, \"sd\" -> {}" +
+			", \"distn\" -> {}|>|>").format(name, (distn["Mean"]).replace("e", "*10^"), 
+			(distn["SD"]).replace("e", "*10^"), 
+			str(distn["distn"]).replace("[", "{").replace("]", "}").replace("'","")))
+
+def print_data(param, fdistn, pdistn, outfile, last):
+	outfile.write("<|")
+	print_param(param, outfile)
 	print_distn(fdistn, "fdistn", outfile)
 	outfile.write(",")
 	print_distn(pdistn, "pdistn", outfile)
