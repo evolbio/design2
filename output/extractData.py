@@ -64,30 +64,10 @@ def read_runs(infile, outfile):
 			continue
 		# fitness distn group
 		if group == 2:
-			if not line.isspace() and (fields[0] == "Mean" or fields[0] == "SD"):
-				fdistn[fields[0]] = fields[1]
-				start = True
-			elif not line.isspace() and start:
-				ptile.append([float(fields[0]),
-					str(float(fields[1])).replace("e", "*10^")])
-			elif line.isspace and start:
-				fdistn["ptile"] = ptile
-				group = 3
-				start = False
-				ptile = []
+			[group, start, ptile] = set_distn(fdistn,ptile,line,start,group)
 			continue
 		if group == 3:
-			if not line.isspace() and (fields[0] == "Mean" or fields[0] == "SD"):
-				pdistn[fields[0]] = fields[1]
-				start = True
-			elif not line.isspace() and start:
-				ptile.append([float(fields[0]),
-					str(float(fields[1])).replace("e", "*10^")])
-			elif line.isspace and start:
-				pdistn["ptile"] = ptile
-				group = 4
-				start = False
-				ptile = []
+			[group, start, ptile] = set_distn(pdistn,ptile,line,start,group)
 			continue
 			
 	print_data(param, fdistn, pdistn, outfile, True)
@@ -102,7 +82,7 @@ def set_distn(distn, ptile, line, start, group):
 		ptile.append([float(fields[0]),
 			str(float(fields[1])).replace("e", "*10^")])
 	elif line.isspace and start:
-		fdistn["ptile"] = ptile
+		distn["ptile"] = ptile
 		group += 1
 		start = False
 		ptile = []
