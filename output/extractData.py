@@ -50,7 +50,7 @@ def read_runs(infile, outfile):
 			print("{} {} {}".format(fields[0], fields[1], fields[2]))
 			group = 1
 			if not firstrun:
-				print_data(param, fdistn, pdistn, outfile, False)
+				print_data(param, fdistn, pdistn, gdistn, outfile, False)
 				param = {}
 				# reset all dicts
 			firstrun = False
@@ -63,9 +63,11 @@ def read_runs(infile, outfile):
 				ptile = []
 				gdistn = []
 				gtile = []
-				for i in range(int(param["loci"])):
+				loci = int(param["loci"])
+				stoch = True if float(param["stochWt"]) > 1e-6 else False
+				for i in range(loci):
 					gdistn.append({})
-					gtile.append([1])
+					gtile.append([])
 			continue
 		# fitness distn group
 		if group == 2:
@@ -77,25 +79,26 @@ def read_runs(infile, outfile):
 			continue
 		# genotype distn group
 		if group == 4:
-			for i in range(int(param["loci"])):
-				[group,start,gtile[i]] = set_distn(gdistn[i],gtile[i],line,start,group,i)
+			for i in range(loci):
+				[group,start,gtile[i]] = \
+					set_distn(gdistn[i],gtile[i],line,start,group,i+1,loci)
 			if group > 4: group = 5
 			continue
 			
-	print_data(param, fdistn, pdistn, outfile, True)
+	print_data(param, fdistn, pdistn, gdistn, outfile, True)
 
-def set_distn(distn, ptile, line, start, group, field_num):
+def set_distn(distn, ptile, line, start, group, field_num, field_max=1):
 	fields = line.split()
 	if not line.isspace() and (fields[0] == "Mean" or fields[0] == "SD"):
 		distn[fields[0]] = fields[field_num]
-		start = True
+		if field_num == field_max: start = True
 	elif not line.isspace() and start:
 		ptile.append([float(fields[0]),
-			str(float(fields[1])).replace("e", "*10^")])
+			str(float(fields[field_num])).replace("e", "*10^")])
 	elif line.isspace and start:
 		distn["ptile"] = ptile
 		group += 1
-		start = False
+		if field_num == field_max: start = False
 		ptile = []
 	return [group, start, ptile]
 
@@ -115,13 +118,22 @@ def print_distn(distn, name, outfile):
 			", \"ptile\" -> {}|>|>").format(name, (distn["Mean"]).replace("e", "*10^"), 
 			(distn["SD"]).replace("e", "*10^"), 
 			str(distn["ptile"]).replace("[", "{").replace("]", "}").replace("'","")))
+			
+def print_gdistn(gdistn, name, outfile):
+	outfile.write("<|\"{}\" -> ".format(name) + "{")
+	for i in range(len(gdistn)):
+		print_distn(gdistn[i], "g" + str(i), outfile)
+		if i != (len(gdistn) - 1): outfile.write(",")
+	outfile.write("}|>")
 
-def print_data(param, fdistn, pdistn, outfile, last):
+def print_data(param, fdistn, pdistn, gdistn, outfile, last):
 	outfile.write("<|")
 	print_param(param, outfile)
 	print_distn(fdistn, "fdistn", outfile)
 	outfile.write(",")
 	print_distn(pdistn, "pdistn", outfile)
+	outfile.write(",")
+	print_gdistn(gdistn, "gdistn", outfile)
 	outfile.write("|>")
 	if not last:
 		outfile.write(",")
