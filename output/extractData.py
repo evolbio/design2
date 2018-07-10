@@ -50,7 +50,7 @@ def read_runs(infile, outfile):
 			print("{} {} {}".format(fields[0], fields[1], fields[2]))
 			group = 1
 			if not firstrun:
-				print_data(param, fdistn, pdistn, gdistn, outfile, False)
+				print_data(param, fdistn, pdistn, gdistn, gcorr, outfile, False)
 				param = {}
 				# reset all dicts
 			firstrun = False
@@ -63,6 +63,7 @@ def read_runs(infile, outfile):
 				ptile = []
 				gdistn = []
 				gtile = []
+				gcorr = []
 				loci = int(param["loci"])
 				stoch = True if float(param["stochWt"]) > 1e-6 else False
 				for i in range(loci):
@@ -84,8 +85,12 @@ def read_runs(infile, outfile):
 					set_distn(gdistn[i],gtile[i],line,start,group,i+1,loci)
 			if group > 4: group = 5
 			continue
+		# genotype corr group
+		if group == 5:
+			[group,start] = set_corr(gcorr,line,start,group,loci)
+			continue
 			
-	print_data(param, fdistn, pdistn, gdistn, outfile, True)
+	print_data(param, fdistn, pdistn, gdistn, gcorr, outfile, True)
 
 def set_distn(distn, ptile, line, start, group, field_num, field_max=1):
 	fields = line.split()
@@ -101,6 +106,15 @@ def set_distn(distn, ptile, line, start, group, field_num, field_max=1):
 		if field_num == field_max: start = False
 		ptile = []
 	return [group, start, ptile]
+	
+def set_corr(corr, line, start, group, loci):
+	fields = line.split()
+	if not line.isspace() and ("." in fields[1]):
+		corr.append(fields[1:(loci+1)])
+		return [group,True]
+	elif line.isspace and start:
+		return [group+1,False]
+	return [group,start]
 
 def print_param(param, outfile):
 	outfile.write("<|\"param\" -> <|")
@@ -126,7 +140,12 @@ def print_gdistn(gdistn, name, outfile):
 		if i != (len(gdistn) - 1): outfile.write(",")
 	outfile.write("}|>")
 
-def print_data(param, fdistn, pdistn, gdistn, outfile, last):
+def print_corr(corr, name, outfile):
+	outfile.write("<|\"{}\" -> ".format(name))
+	outfile.write("{}".format(corr).replace("[", "{").replace("]", "}").replace("'",""))
+	outfile.write("|>")
+
+def print_data(param, fdistn, pdistn, gdistn, gcorr, outfile, last):
 	outfile.write("<|")
 	print_param(param, outfile)
 	print_distn(fdistn, "fdistn", outfile)
@@ -134,6 +153,8 @@ def print_data(param, fdistn, pdistn, gdistn, outfile, last):
 	print_distn(pdistn, "pdistn", outfile)
 	outfile.write(",")
 	print_gdistn(gdistn, "gdistn", outfile)
+	outfile.write(",")
+	print_corr(gcorr, "gcorr", outfile)
 	outfile.write("|>")
 	if not last:
 		outfile.write(",")
@@ -141,9 +162,6 @@ def print_data(param, fdistn, pdistn, gdistn, outfile, last):
 main()
 
 
-# Dataset[{
-# 	<|"run" -> 1, "fitD" -> <|"mean" -> 2, "sd" -> 3, 
-#      "ptile" -> {{0, 1}, {1, 2}}|>|>,
-#      <|"run" -> 1, "fitD" -> <|"mean" -> 2, "sd" -> 3, 
-#      "ptile" -> {{0, 1}, {1, 2}}|>|>
-# }]
+
+
+
