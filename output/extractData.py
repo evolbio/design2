@@ -41,6 +41,8 @@ def close_files(infile, outfile):
 def read_runs(infile, outfile):
 	firstrun = True
 	param = {}
+	fdistn = {}
+	pdistn = {}
 	for line in infile:
 		fields = line.split()
 		# param group
@@ -58,8 +60,7 @@ def read_runs(infile, outfile):
 			else:
 				group = 2
 				start = False
-				fdistn = {}
-				distn = []
+				ptile = []
 			continue
 		# fitness distn group
 		if group == 2:
@@ -67,32 +68,46 @@ def read_runs(infile, outfile):
 				fdistn[fields[0]] = fields[1]
 				start = True
 			elif not line.isspace() and start:
-				distn.append([float(fields[0]),
+				ptile.append([float(fields[0]),
 					str(float(fields[1])).replace("e", "*10^")])
 			elif line.isspace and start:
-				fdistn["distn"] = distn
+				fdistn["ptile"] = ptile
 				group = 3
 				start = False
-				pdistn = {}
-				distn = []
+				ptile = []
 			continue
 		if group == 3:
 			if not line.isspace() and (fields[0] == "Mean" or fields[0] == "SD"):
 				pdistn[fields[0]] = fields[1]
 				start = True
 			elif not line.isspace() and start:
-				distn.append([float(fields[0]),
+				ptile.append([float(fields[0]),
 					str(float(fields[1])).replace("e", "*10^")])
 			elif line.isspace and start:
-				pdistn["distn"] = distn
+				pdistn["ptile"] = ptile
 				group = 4
 				start = False
-				gdistn = []
-				distn = []
+				ptile = []
 			continue
 			
 	print_data(param, fdistn, pdistn, outfile, True)
-	
+
+# CONTINUE HERE XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX	
+def set_distn(distn, ptile, line, start, group):
+	fields = line.split()
+	if not line.isspace() and (fields[0] == "Mean" or fields[0] == "SD"):
+		distn[fields[0]] = fields[1]
+		start = True
+	elif not line.isspace() and start:
+		ptile.append([float(fields[0]),
+			str(float(fields[1])).replace("e", "*10^")])
+	elif line.isspace and start:
+		fdistn["ptile"] = ptile
+		group += 1
+		start = False
+		ptile = []
+	return [group, start, ptile]
+
 def print_param(param, outfile):
 	outfile.write("<|\"param\" -> <|")
 	first = True
@@ -106,9 +121,9 @@ def print_param(param, outfile):
 
 def print_distn(distn, name, outfile):
 	outfile.write(("<|\"{}\" -> <| \"mean\" -> {}, \"sd\" -> {}" +
-			", \"distn\" -> {}|>|>").format(name, (distn["Mean"]).replace("e", "*10^"), 
+			", \"ptile\" -> {}|>|>").format(name, (distn["Mean"]).replace("e", "*10^"), 
 			(distn["SD"]).replace("e", "*10^"), 
-			str(distn["distn"]).replace("[", "{").replace("]", "}").replace("'","")))
+			str(distn["ptile"]).replace("[", "{").replace("]", "}").replace("'","")))
 
 def print_data(param, fdistn, pdistn, outfile, last):
 	outfile.write("<|")
