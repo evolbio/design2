@@ -50,7 +50,8 @@ def read_runs(infile, outfile):
 			print("{} {} {}".format(fields[0], fields[1], fields[2]))
 			group = 1
 			if not firstrun:
-				print_data(param, fdistn, pdistn, gdistn, gcorr, outfile, False)
+				print_data(param,fdistn,pdistn,gdistn,gcorr,sdistn,\
+					scorr,sgcorr,outfile,stoch,False)
 				param = {}
 				# reset all dicts
 			firstrun = False
@@ -62,12 +63,16 @@ def read_runs(infile, outfile):
 				start = False
 				ptile = []
 				gdistn = []
+				sdistn = []
 				gtile = []
 				gcorr = []
+				scorr = []
+				sgcorr = []
 				loci = int(param["loci"])
 				stoch = True if float(param["stochWt"]) > 1e-6 else False
 				for i in range(loci):
 					gdistn.append({})
+					sdistn.append({})
 					gtile.append([])
 			continue
 		# fitness distn group
@@ -89,8 +94,23 @@ def read_runs(infile, outfile):
 		if group == 5:
 			[group,start] = set_corr(gcorr,line,start,group,loci)
 			continue
+		# stoch genotype distn group
+		if group == 6:
+			for i in range(loci):
+				[group,start,gtile[i]] = \
+					set_distn(sdistn[i],gtile[i],line,start,group,i+1,loci)
+			if group > 6: group = 7
+			continue
+		# stochastic corr group
+		if group == 7:
+			[group,start] = set_corr(scorr,line,start,group,loci)
+			continue
+		# stochastic X genotype corr group
+		if group == 8:
+			[group,start] = set_corr(sgcorr,line,start,group,loci)
+			continue
 			
-	print_data(param, fdistn, pdistn, gdistn, gcorr, outfile, True)
+	print_data(param,fdistn,pdistn,gdistn,gcorr,sdistn,scorr,sgcorr,outfile,stoch,True)
 
 def set_distn(distn, ptile, line, start, group, field_num, field_max=1):
 	fields = line.split()
@@ -145,7 +165,7 @@ def print_corr(corr, name, outfile):
 	outfile.write("{}".format(corr).replace("[", "{").replace("]", "}").replace("'",""))
 	outfile.write("|>")
 
-def print_data(param, fdistn, pdistn, gdistn, gcorr, outfile, last):
+def print_data(param,fdistn,pdistn,gdistn,gcorr,sdistn,scorr,sgcorr,outfile,stoch,last):
 	outfile.write("<|")
 	print_param(param, outfile)
 	print_distn(fdistn, "fdistn", outfile)
@@ -155,6 +175,13 @@ def print_data(param, fdistn, pdistn, gdistn, gcorr, outfile, last):
 	print_gdistn(gdistn, "gdistn", outfile)
 	outfile.write(",")
 	print_corr(gcorr, "gcorr", outfile)
+	if stoch:
+		outfile.write(",")
+		print_gdistn(sdistn, "sdistn", outfile)		
+		outfile.write(",")
+		print_corr(scorr, "scorr", outfile)		
+		outfile.write(",")
+		print_corr(sgcorr, "sgcorr", outfile)		
 	outfile.write("|>")
 	if not last:
 		outfile.write(",")
