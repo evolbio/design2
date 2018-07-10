@@ -61,22 +61,33 @@ def read_runs(infile, outfile):
 				group = 2
 				start = False
 				ptile = []
+				gdistn = []
+				gtile = []
+				for i in range(int(param["loci"])):
+					gdistn.append({})
+					gtile.append([1])
 			continue
 		# fitness distn group
 		if group == 2:
-			[group, start, ptile] = set_distn(fdistn,ptile,line,start,group)
+			[group,start,ptile] = set_distn(fdistn,ptile,line,start,group,1)
 			continue
+		# performance distn group
 		if group == 3:
-			[group, start, ptile] = set_distn(pdistn,ptile,line,start,group)
+			[group,start,ptile] = set_distn(pdistn,ptile,line,start,group,1)
+			continue
+		# genotype distn group
+		if group == 4:
+			for i in range(int(param["loci"])):
+				[group,start,gtile[i]] = set_distn(gdistn[i],gtile[i],line,start,group,i)
+			if group > 4: group = 5
 			continue
 			
 	print_data(param, fdistn, pdistn, outfile, True)
 
-# CONTINUE HERE XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX	
-def set_distn(distn, ptile, line, start, group):
+def set_distn(distn, ptile, line, start, group, field_num):
 	fields = line.split()
 	if not line.isspace() and (fields[0] == "Mean" or fields[0] == "SD"):
-		distn[fields[0]] = fields[1]
+		distn[fields[0]] = fields[field_num]
 		start = True
 	elif not line.isspace() and start:
 		ptile.append([float(fields[0]),
