@@ -1,6 +1,7 @@
 *.osx
 sensitivity_client
 01_Literature
+analysis
 sensitivity
 log
 proto

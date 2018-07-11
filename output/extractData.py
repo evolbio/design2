@@ -154,11 +154,11 @@ def print_distn(distn, name, outfile):
 			str(distn["ptile"]).replace("[", "{").replace("]", "}").replace("'","")))
 			
 def print_gdistn(gdistn, name, outfile):
-	outfile.write("<|\"{}\" -> ".format(name) + "{")
+	outfile.write("<|\"{}\" -> ".format(name) + "<|")
 	for i in range(len(gdistn)):
 		print_distn(gdistn[i], "g" + str(i), outfile)
 		if i != (len(gdistn) - 1): outfile.write(",")
-	outfile.write("}|>")
+	outfile.write("|>|>")
 
 def print_corr(corr, name, outfile):
 	outfile.write("<|\"{}\" -> ".format(name))
