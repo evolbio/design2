@@ -14,6 +14,7 @@
 import os
 import sys
 import re
+import bz2
 from inspect import currentframe, getframeinfo
 
 def main():
@@ -28,8 +29,13 @@ def read_args_open_files():
 	if not os.path.isfile(sys.argv[1]):
 		print("\n\tFile {} not found".format(sys.argv[1]))
 		exit()
-	infile = open(sys.argv[1], 'r')
-	outfile = open(sys.argv[1] + ".mma", 'w')
+	infile_name = sys.argv[1]
+	if "bz2" in infile_name:
+		infile = bz2.open(infile_name, 'rt')
+	else:
+		infile = open(infile_name, 'rt')
+	infile_name = infile_name.replace('.bz2', '')
+	outfile = bz2.open(infile_name + ".mma.bz2", 'wt')
 	outfile.write("Dataset[{\n")
 	return [infile, outfile]
 	
