@@ -150,7 +150,11 @@ def print_param(param, outfile):
 			outfile.write(",")
 		first = False
 		# change e -> E because MMA only recognizes E for sci notation
-		outfile.write("\"{}\" -> {}".format(k, param[k].replace("e", "*10^")))
+		# do not change "None" for recT param
+		if param[k] != "None":
+			outfile.write("\"{}\" -> {}".format(k, param[k].replace("e", "*10^")))
+		else:
+			outfile.write("\"{}\" -> {}".format(k, param[k]))
 	outfile.write("|>|>,")
 
 def print_distn(distn, name, outfile):
