@@ -109,6 +109,7 @@ void Population::calcStats(Param& param, SumStat& stats)
             sSD[i] = vecSD<double>(sMatrix[i], sMean[i]);
         }
     }
+    // not correct for sgCorr, because not symmetric, must fix this
     for (i = 0; i < loci; ++i){
         for (j = i; j < loci; ++j){
             // corr of g loci
