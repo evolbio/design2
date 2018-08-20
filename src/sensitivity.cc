@@ -218,6 +218,10 @@ void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
     }
     resultss << "\n";
     
+    // print low fitness repeatability fraction
+    
+    resultss << fmt::format("Low fitness repeatability = {:6.4f}\n\n", stats.getLowFraction());
+    
     // print performance distn
     
     resultss << fmt::format("{}", "Performance distribution\n\n");

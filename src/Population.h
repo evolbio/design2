@@ -16,6 +16,7 @@ public:
 	int			getPopSize(){return popSize;}
 	Individual&	getInd(int i){return ind[i];}
     Individual& chooseInd(){return ind[getRandIndex()];}
+    void        partialSortInd(int sortToIndex);  // sort first percent of individuals by fitness
     void		setFitnessArray();
 	void		reproduceMutateCalcFit(Population& oldPop);
     void        reproduceNoMutRec(Population& oldPop);

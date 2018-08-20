@@ -109,7 +109,6 @@ void Population::calcStats(Param& param, SumStat& stats)
             sSD[i] = vecSD<double>(sMatrix[i], sMean[i]);
         }
     }
-    // not correct for sgCorr, because not symmetric, must fix this
     for (i = 0; i < loci; ++i){
         for (j = i; j < loci; ++j){
             // corr of g loci
@@ -166,6 +165,22 @@ void Population::calcStats(Param& param, SumStat& stats)
     
     auto& perfDistn = stats.getPerfDistn();
     perfDistn = percentiles_interpol<std::vector<double>>(indPerf, ptiles);
+    
+    // fitness repeatability of low-performing individuals
+    
+    int percent = 10;   // percentage of individuals in lower tail to study
+    int repeat = 30;    // replicate calcFitness() for each individual in set
+    int sortToIndex = (popSize * percent) / 100;
+    partialSortInd(sortToIndex+1);      // need fitness of one above lower percent group
+    double fitnessThreshold = ind[sortToIndex].getFitness();
+    double samples = sortToIndex * repeat;
+    int numBelowThreshold = 0;
+    for (i = 0; i < sortToIndex; ++i){
+        for (j = 0; j < repeat; ++j){
+            if (ind[i].calcFitness() < fitnessThreshold) ++numBelowThreshold;
+        }
+    }
+    stats.setLowFraction(static_cast<double>(numBelowThreshold)/samples);
 }
 
 // Alias method for sampling from discrete distribution, see https://pandasthumb.org/archives/2012/08/lab-notes-the-a.html and https://en.wikipedia.org/wiki/Alias_method and http://www.keithschwarz.com/darts-dice-coins/
@@ -236,3 +251,10 @@ void Population::createAliasTable() {
     }
 }
 
+// Sort individuals by fitness, sorting only lower end of fitness distribution. Used for working with set of lowest fitness individuals to test for "heritability" of disease.
+void Population::partialSortInd(int sortToIndex){
+    partial_sort(ind.begin(), ind.begin() + sortToIndex, ind.end(),
+                 [](Individual& a, Individual& b) -> bool {
+                     return a.getFitness() < b.getFitness();
+                 });
+}
