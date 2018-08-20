@@ -121,10 +121,14 @@ void Population::calcStats(Param& param, SumStat& stats)
                 double covS = vecCov(sMatrix[i], sMatrix[j], sMean[i], sMean[j]);
                 double prodSDS = sSD[i]*sSD[j];
                 sCorr[i][j] = sCorr[j][i] = (prodSDS < 1e-10) ? 0.0 : covS/(prodSDS);
-                // cross corr of g[i] and s[j]
-                double covSG = vecCov(gMatrix[i], sMatrix[j], gMean[i], sMean[j]);
-                double prodSDSG = gSD[i]*sSD[j];
-                sgCorr[i][j] = sgCorr[j][i] = (prodSDSG < 1e-10) ? 0.0 : covSG/(prodSDSG);
+                // cross corr of s[i] and g[j]
+                double covSG = vecCov(gMatrix[j], sMatrix[i], gMean[j], sMean[i]);
+                double prodSDSG = gSD[j]*sSD[i];
+                sgCorr[i][j] = (prodSDSG < 1e-10) ? 0.0 : covSG/(prodSDSG);
+                // cross corr of s[j] and g[i]
+                covSG = vecCov(gMatrix[i], sMatrix[j], gMean[i], sMean[j]);
+                prodSDSG = gSD[i]*sSD[j];
+                sgCorr[j][i] = (prodSDSG < 1e-10) ? 0.0 : covSG/(prodSDSG);
             }
         }
     }

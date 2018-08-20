@@ -180,16 +180,17 @@ void PrintGDistn(Param& param, std::ostringstream& resultss,
     resultss << "\n\n";
 }
 
-void PrintGCorr(Param& param, std::ostringstream& resultss, std::vector<std::vector<double>> corr)
+void PrintGCorr(Param& param, std::ostringstream& resultss, std::vector<std::vector<double>> corr,
+                std::string& rlabel, std::string& clabel)
 {
     resultss <<  "     ";
     for (int i = 0; i < param.loci; ++i){
-        resultss << fmt::format((i < 10) ? "{:>6}{:1}" : "{:>5}{:2}", "g", i);
+        resultss << fmt::format((i < 10) ? "{:>6}{:1}" : "{:>5}{:2}", clabel, i);
     }
     resultss << "\n";
     
     for (int i = 0; i < param.loci; ++i){
-        resultss << fmt::format((i < 10) ? "{:>4}{:1}" : "{:>3}{:2}", "g", i);
+        resultss << fmt::format((i < 10) ? "{:>4}{:1}" : "{:>3}{:2}", rlabel, i);
         for (int j = 0; j < param.loci; ++j){
             resultss << fmt::format("{:7.3f}", corr[i][j]);
         }
@@ -245,7 +246,8 @@ void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
     const auto& gCorr = stats.getGCorr();
     
     resultss << "Correlation of G values\n\n";
-    PrintGCorr(param, resultss, gCorr);
+    std::string g("g");
+    PrintGCorr(param, resultss, gCorr, g, g);
     
     if (param.stoch){
         // print stoch distn statistics for each locus
@@ -262,14 +264,15 @@ void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
         const auto& corr = stats.getSCorr();
         
         resultss << "Correlation of stoch values\n\n";
-        PrintGCorr(param, resultss, corr);
+        std::string s("s");
+        PrintGCorr(param, resultss, corr, s, s);
         
         // print S X G corr matrix
         
         const auto& corrsg = stats.getSGCorr();
         
         resultss << "Correlation of stoch x genotype values\n\n";
-        PrintGCorr(param, resultss, corrsg);
+        PrintGCorr(param, resultss, corrsg, s, g);
     }
 }
 
