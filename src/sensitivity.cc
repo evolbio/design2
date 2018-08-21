@@ -220,7 +220,7 @@ void PrintSummary(Param& param, std::ostringstream& resultss, SumStat& stats)
     
     // print low fitness repeatability fraction
     
-    resultss << fmt::format("Low fitness repeatability = {:6.4f}\n\n", stats.getLowFraction());
+    resultss << fmt::format("Low fitness cutoff, %tile, repeat = {:4.2f}, {:6.2f}, {:5.3f}\n\n", stats.getLowFitCutoff(), stats.getLowFitPtile(), stats.getLowFitRepeat());
     
     // print performance distn
     

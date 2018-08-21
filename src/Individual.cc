@@ -42,7 +42,7 @@ Individual::Individual(const Individual& other)
         genotype[i] = other.genotype[i];
         if (stoch) stochast[i] = other.stochast[i];
     }
-    fitness = calcFitness();
+    fitness = other.fitness;
 }
 
 // assignment constructor
@@ -54,7 +54,7 @@ Individual& Individual::operator=(const Individual& other)
         genotype[i] = other.genotype[i];
         if (stoch) stochast[i] = other.stochast[i];
     }
-    fitness = calcFitness();
+    fitness = other.fitness;
     return *this;
 }
 

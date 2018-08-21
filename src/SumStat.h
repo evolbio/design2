@@ -29,8 +29,12 @@ public:
     double      getSDPerf(){return sdPerf;}
     void        setAvePerf(double x){avePerf = x;}
     void        setSDPerf(double x){sdPerf = x;}
-    void        setLowFraction(double x){lowFraction = x;}
-    double      getLowFraction(){return lowFraction;}
+    void        setLowFitCutoff(double x){lowFitCutoff = x;}
+    double      getLowFitCutoff(){return lowFitCutoff;}
+    void        setLowFitPtile(double x){lowFitPtile = x;}
+    double      getLowFitPtile(){return lowFitPtile;}
+    void        setLowFitRepeat(double x){lowFitRepeat = x;}
+    double      getLowFitRepeat(){return lowFitRepeat;}
 private:
     std::vector<double> gMean;                  // mean values of alleles
     std::vector<double> gSD;                    // sd values of alleles
@@ -47,7 +51,9 @@ private:
     double      sdFitness;
     double      avePerf;
     double      sdPerf;
-    double      lowFraction;
+    double      lowFitCutoff;
+    double      lowFitPtile;
+    double      lowFitRepeat;
     std::vector<double> fitnessDistn;
     std::vector<double> perfDistn;
 };

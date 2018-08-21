@@ -168,19 +168,32 @@ void Population::calcStats(Param& param, SumStat& stats)
     
     // fitness repeatability of low-performing individuals
     
-    int percent = 10;   // percentage of individuals in lower tail to study
-    int repeat = 30;    // replicate calcFitness() for each individual in set
-    int sortToIndex = (popSize * percent) / 100;
-    partialSortInd(sortToIndex+1);      // need fitness of one above lower percent group
-    double fitnessThreshold = ind[sortToIndex].getFitness();
-    double samples = sortToIndex * repeat;
-    int numBelowThreshold = 0;
-    for (i = 0; i < sortToIndex; ++i){
-        for (j = 0; j < repeat; ++j){
-            if (ind[i].calcFitness() < fitnessThreshold) ++numBelowThreshold;
-        }
+    double fitnessThreshold = 0.9;  // count individuals w/fitness <= cutoff
+    stats.setLowFitCutoff(fitnessThreshold);
+    int repeat = 100;               // replicate calcFitness() for each individual in set
+    fullSortInd();                  // sort full population
+    i = 0;
+    while((ind[i++].getFitness() <= fitnessThreshold) && (i < popSize));
+    if (i == 1){
+        stats.setLowFitPtile(0);
+        stats.setLowFitRepeat(0);
     }
-    stats.setLowFraction(static_cast<double>(numBelowThreshold)/samples);
+    else if (i == popSize){
+        stats.setLowFitPtile(100);
+        stats.setLowFitRepeat(1);
+    }
+    else{
+        int thresholdIndex = i - 1;
+        double samples = thresholdIndex * repeat;
+        int numBelowThreshold = 0;
+        for (i = 0; i < thresholdIndex; ++i){
+            for (j = 0; j < repeat; ++j){
+                if (ind[i].calcFitness() < fitnessThreshold) ++numBelowThreshold;
+            }
+        }
+        stats.setLowFitPtile((100.0*thresholdIndex)/static_cast<double>(popSize));
+        stats.setLowFitRepeat(static_cast<double>(numBelowThreshold)/samples);
+    }
 }
 
 // Alias method for sampling from discrete distribution, see https://pandasthumb.org/archives/2012/08/lab-notes-the-a.html and https://en.wikipedia.org/wiki/Alias_method and http://www.keithschwarz.com/darts-dice-coins/
@@ -252,9 +265,12 @@ void Population::createAliasTable() {
 }
 
 // Sort individuals by fitness, sorting only lower end of fitness distribution. Used for working with set of lowest fitness individuals to test for "heritability" of disease.
-void Population::partialSortInd(int sortToIndex){
-    partial_sort(ind.begin(), ind.begin() + sortToIndex, ind.end(),
-                 [](Individual& a, Individual& b) -> bool {
-                     return a.getFitness() < b.getFitness();
-                 });
+void Population::partialSortInd(unsigned long sortToIndex){
+    std::partial_sort(ind.begin(), ind.begin() + sortToIndex, ind.end(),
+                 [&](Individual& a, Individual& b){return a.getFitness() < b.getFitness();});
+}
+
+// Sort individuals by fitness
+void Population::fullSortInd(){
+    std::sort(ind.begin(), ind.end(), [&](Individual& a, Individual& b){return a.getFitness() < b.getFitness();});
 }
