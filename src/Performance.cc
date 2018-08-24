@@ -142,6 +142,7 @@ double integrandH2(double w, void *p)
 }
 
 // deriv works for both output signal and control signal, see MMA file
+// Possible speed up by optimizing deriv, see callgrind source code line by line weighting of time cost.
 
 int deriv(double t, const double x[], double f[], void *p)
 {
