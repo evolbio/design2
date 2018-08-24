@@ -49,6 +49,7 @@ def read_runs(infile, outfile):
 	param = {}
 	fdistn = {}
 	pdistn = {}
+	lowfit = {}
 	for line in infile:
 		fields = line.split()
 		# param group
@@ -56,9 +57,10 @@ def read_runs(infile, outfile):
 			print("{} {} {}".format(fields[0], fields[1], fields[2]))
 			group = 1
 			if not firstrun:
-				print_data(param,fdistn,pdistn,gdistn,gcorr,sdistn,\
+				print_data(param,fdistn,lowfit,pdistn,gdistn,gcorr,sdistn,\
 					scorr,sgcorr,outfile,stoch,False)
 				param = {}
+				lowfit = {}
 				# reset all dicts
 			firstrun = False
 		if group == 1:
@@ -83,17 +85,17 @@ def read_runs(infile, outfile):
 			continue
 		# fitness distn group
 		if group == 2:
-			[group,start,ptile] = set_distn(fdistn,ptile,line,start,group,1)
+			[group,start,ptile] = set_distn(fdistn,ptile,lowfit,line,start,group,1)
 			continue
 		# performance distn group
 		if group == 3:
-			[group,start,ptile] = set_distn(pdistn,ptile,line,start,group,1)
+			[group,start,ptile] = set_distn(pdistn,ptile,lowfit,line,start,group,1)
 			continue
 		# genotype distn group
 		if group == 4:
 			for i in range(loci):
 				[group,start,gtile[i]] = \
-					set_distn(gdistn[i],gtile[i],line,start,group,i+1,loci)
+					set_distn(gdistn[i],gtile[i],lowfit,line,start,group,i+1,loci)
 			if group > 4: group = 5
 			continue
 		# genotype corr group
@@ -104,7 +106,7 @@ def read_runs(infile, outfile):
 		if group == 6:
 			for i in range(loci):
 				[group,start,gtile[i]] = \
-					set_distn(sdistn[i],gtile[i],line,start,group,i+1,loci)
+					set_distn(sdistn[i],gtile[i],lowfit,line,start,group,i+1,loci)
 			if group > 6: group = 7
 			continue
 		# stochastic corr group
@@ -116,13 +118,18 @@ def read_runs(infile, outfile):
 			[group,start] = set_corr(sgcorr,line,start,group,loci)
 			continue
 			
-	print_data(param,fdistn,pdistn,gdistn,gcorr,sdistn,scorr,sgcorr,outfile,stoch,True)
+	print_data(param,fdistn,lowfit,pdistn,gdistn,gcorr,sdistn,scorr,sgcorr,outfile,stoch,True)
 
-def set_distn(distn, ptile, line, start, group, field_num, field_max=1):
+def set_distn(distn, ptile, lowfit, line, start, group, field_num, field_max=1):
 	fields = line.split()
 	if not line.isspace() and (fields[0] == "Mean" or fields[0] == "SD"):
 		distn[fields[0]] = fields[field_num]
 		if field_num == field_max: start = True
+	# in later experiments, "Low fitness cutoff data" added
+	elif not line.isspace() and (fields[0] == "Low" and fields[1] == "fitness"):
+		lowfit["cutoff"] = float(fields[6].replace(',', ''))
+		lowfit["ptile"] = float(fields[7].replace(',', ''))
+		lowfit["repeat"] = float(fields[8].replace(',', ''))
 	elif not line.isspace() and start:
 		ptile.append([float(fields[0]),
 			str(float(fields[field_num])).replace("e", "*10^")])
@@ -163,6 +170,13 @@ def print_distn(distn, name, outfile):
 			(distn["SD"]).replace("e", "*10^"), 
 			str(distn["ptile"]).replace("[", "{").replace("]", "}").replace("'","")))
 			
+def print_lowfit(lowfit, outfile):
+	outfile.write("<|\"lowfit\" -> " + "<|")
+	outfile.write("\"cutoff\" -> " + str(lowfit["cutoff"]) + ",")
+	outfile.write("\"ptile\" -> " + str(lowfit["ptile"]) + ",")
+	outfile.write("\"repeat\" -> " + str(lowfit["repeat"]))
+	outfile.write("|>|>")
+			
 def print_gdistn(gdistn, name, outfile):
 	outfile.write("<|\"{}\" -> ".format(name) + "<|")
 	for i in range(len(gdistn)):
@@ -175,11 +189,14 @@ def print_corr(corr, name, outfile):
 	outfile.write("{}".format(corr).replace("[", "{").replace("]", "}").replace("'",""))
 	outfile.write("|>")
 
-def print_data(param,fdistn,pdistn,gdistn,gcorr,sdistn,scorr,sgcorr,outfile,stoch,last):
+def print_data(param,fdistn,lowfit,pdistn,gdistn,gcorr,sdistn,scorr,sgcorr,outfile,stoch,last):
 	outfile.write("<|")
 	print_param(param, outfile)
 	print_distn(fdistn, "fdistn", outfile)
 	outfile.write(",")
+	if len(lowfit) > 0:
+		print_lowfit(lowfit, outfile)
+		outfile.write(",")
 	print_distn(pdistn, "pdistn", outfile)
 	outfile.write(",")
 	print_gdistn(gdistn, "gdistn", outfile)
